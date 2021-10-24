@@ -30,6 +30,17 @@ namespace TreeManipulation
             return n.Label.Equals(tag);
         }
 
+        public static bool MatchAttribute(Node n, string attr)
+        {
+            return n.Attributes.TryGetValue(attr, out var _);
+        }
+
+        public static bool MatchAttributeValue(Node n, string attr, string value)
+        {
+            var hasAttr = n.Attributes.TryGetValue(attr, out var actualVal);
+            return hasAttr ? actualVal.Equals(value) : false;
+        }
+
         public static bool True() => true;
 
         public static bool Match(string n, string r)
