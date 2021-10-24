@@ -22,7 +22,7 @@ namespace TreeManipulation
     public class TreeManipTest
     {
         private const string _GrammarPath = @"../../../../ProseTutorial/tree_synthesis/grammar/treemanim.grammar";
-        private static SequenceTestObject<Node, object> testObject;
+        private static SequenceTestObject<Node, Node> testObject;
 
         private static StructNode TN(string label)
         {
@@ -45,7 +45,7 @@ namespace TreeManipulation
         [ClassInitialize]
         public static void Init(TestContext _)
         {
-            testObject = new SequenceTestObject<Node, object>(_GrammarPath);
+            testObject = new SequenceTestObject<Node, Node>(_GrammarPath);
 
             testObject.Init(
                 g => new RankingScore(g),
@@ -192,6 +192,36 @@ namespace TreeManipulation
                     TN("child2")),
 
                 TN("special")
+                );
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestLearnConcat()
+        {
+            testObject.CreateExample(
+                TN("parent",
+                    TN("special1"),
+                    TN("child2"),
+                    TN("special2")),
+
+                TN("special1"),
+                TN("special2")
+                );
+
+            testObject.CreateTestCase(
+                TN("parent",
+                    TN("child1", 
+                        TN("child3"),
+                        TN("special")),
+                    TN("child2"),
+                    TN("child3")),
+
+                TN("child1", 
+                    TN("child3"),
+                    TN("special")),
+                TN("child3")
                 );
 
             testObject.RunTest();

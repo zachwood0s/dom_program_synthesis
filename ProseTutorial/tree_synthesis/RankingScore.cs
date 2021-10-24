@@ -14,7 +14,11 @@ namespace TreeManipulation
         {
             //Microsoft.ProgramSynthesis.Rules.Concepts.
         }
+        private const int discourage = -20;
         protected override double GetFeatureValueForVariable(VariableNode variable) => 0;
+
+        [FeatureCalculator(nameof(Semantics.Concat))]
+        public static double Concat(double a, double b) => a + b + discourage;
 
         [FeatureCalculator(nameof(Semantics.Children))]
         public static double Children(double node) => node + 1; // Favor children over descendants
@@ -29,16 +33,16 @@ namespace TreeManipulation
         public static double SelectChild(double x, double k) => x + k;
 
         [FeatureCalculator("Selected")]
-        public static double Selected(double match, double rule) => match + rule;
+        public static double Selected(double match, double rule) => match + rule; // Worse than just running the rule by itself
 
         [FeatureCalculator(nameof(Semantics.MatchTag))]
         public static double MatchTag(double node, double tag) => node + tag;
 
         [FeatureCalculator(nameof(Semantics.True))]
-        public static double True() => 0;
+        public static double True() => discourage;
 
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
-        public static double ScoreK(int k) => 1.0/k;
+        public static double ScoreK(int k) => k != 0 ? 1.0/k : 0;
 
         [FeatureCalculator("tag", Method = CalculationMethod.FromLiteral)]
         public static double ScoreTag(string tag) => 0;
