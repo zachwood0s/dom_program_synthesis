@@ -1,0 +1,16 @@
+﻿using semantics SubstringSynthesis.Semantics;
+using learners SubstringSynthesis.WitnessFunctions;
+
+language Substring;
+
+@complete feature double Score = SubstringSynthesis.RankingScore;
+
+@input string s;
+
+@start string program := SubstringPP(s, pos, pos) | SubstringPL(s, pos, l) | Date(s);
+
+int pos := AbsPos(s, k) | RelPosLeft(s, r) | RelPosRight(s, r)
+
+int k;
+int l;
+Regex r;
