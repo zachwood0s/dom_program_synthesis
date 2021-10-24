@@ -11,6 +11,12 @@ namespace SubstringSynthesis
         {
         }
 
+        [FeatureCalculator(nameof(Semantics.Concat))]
+        public static double Concat(double s1, double s2)
+        {
+            return s1 * s2;
+        }
+
         [FeatureCalculator(nameof(Semantics.SubstringPP))]
         public static double SubstringPP(double s, double start, double end)
         {
@@ -26,7 +32,7 @@ namespace SubstringSynthesis
         [FeatureCalculator(nameof(Semantics.Date))]
         public static double Date(double s)
         {
-            return s * s    ;
+            return s * s;
         }
 
         [FeatureCalculator(nameof(Semantics.AbsPos))]

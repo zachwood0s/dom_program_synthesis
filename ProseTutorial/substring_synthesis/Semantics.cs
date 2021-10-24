@@ -5,6 +5,11 @@ namespace SubstringSynthesis
 {
     public static class Semantics
     {
+        public static string Concat(string s1, string s2)
+        {
+            return s1 + s2;
+        }
+
         public static string SubstringPP(string v, int start, int end)
         {
             return v.Substring(start, end - start);
@@ -57,7 +62,7 @@ namespace SubstringSynthesis
                 }
             }
 
-            return null;
+            return v;
         }
     }
 }

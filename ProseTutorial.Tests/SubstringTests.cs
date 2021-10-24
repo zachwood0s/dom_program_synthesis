@@ -19,7 +19,7 @@ namespace SubstringSynthesis
     public class SubstringTests
     {
         [TestMethod]
-        public void TestSubstringNumbers()
+        public void TestNumbers()
         {
             TestObject testObject = new TestObject();
 
@@ -35,7 +35,7 @@ namespace SubstringSynthesis
         }
 
         [TestMethod]
-        public void TestSubstringDate()
+        public void TestDate()
         {
             TestObject testObject = new TestObject();
 
@@ -49,7 +49,7 @@ namespace SubstringSynthesis
         }
 
         [TestMethod]
-        public void TestSubstringPhoneNumbers()
+        public void TestPhoneNumbers()
         {
             TestObject testObject = new TestObject();
 
@@ -62,7 +62,20 @@ namespace SubstringSynthesis
         }
 
         [TestMethod]
-        public void TestSubstringPrefix()
+        public void TestConcat()
+        {
+            TestObject testObject = new TestObject();
+
+            testObject.CreateExample("1-2-3", "123");
+            testObject.CreateExample("aa-b-c", "aabc");
+
+            testObject.CreateTestCase("3-2-1", "321");
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestPrefix()
         {
             TestObject testObject = new TestObject();
 

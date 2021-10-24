@@ -15,12 +15,53 @@ namespace SubstringSynthesis
         {
             @"[a-zA-Z]", @"\d", @"\s", @"$", "+",
             @"\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}" // Phone number
-
         };
 
         public WitnessFunctions(Grammar grammar) : base(grammar)
         {
         }
+
+        #region Concat Witness Functions
+
+        [WitnessFunction(nameof(Semantics.Concat), 0)]
+        public DisjunctiveExamplesSpec WitnessS1(GrammarRule rule, ExampleSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, object> example in spec.Examples)
+            {
+                State inputState = example.Key;
+                var output = example.Value as string;
+                var strings = new List<string>();
+
+                for (int i = 1; i < output.Length; i++) strings.Add(output.Substring(0, i));
+
+                //if (strings.Count == 0) return null;
+                result[inputState] = strings;
+            }
+
+            return new DisjunctiveExamplesSpec(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.Concat), 1, DependsOnParameters = new[] { 0 })]
+        public ExampleSpec WitnessS2(GrammarRule rule, ExampleSpec spec, ExampleSpec s1Spec)
+        {
+            var result = new Dictionary<State, object>();
+
+            foreach (KeyValuePair<State, object> example in spec.Examples)
+            {
+                State inputState = example.Key;
+                var output = example.Value as string;
+                var s1 = (string) s1Spec.Examples[inputState];
+                result[inputState] = output.Substring(s1.Length - 1, output.Length - s1.Length);
+            }
+
+            return new ExampleSpec(result);
+        }
+
+        #endregion
+
+        #region Substring Witness Fuctions
 
         [WitnessFunction(nameof(Semantics.SubstringPP), 1)]
         [WitnessFunction(nameof(Semantics.SubstringPL), 1)]
@@ -37,7 +78,7 @@ namespace SubstringSynthesis
 
                 for (int i = input.IndexOf(output); i >= 0; i = input.IndexOf(output, i + 1)) occurrences.Add(i);
 
-                if (occurrences.Count == 0) return null;
+                //if (occurrences.Count == 0) return null;
                 result[inputState] = occurrences.Cast<object>();
             }
 
@@ -75,6 +116,10 @@ namespace SubstringSynthesis
 
             return new ExampleSpec(result);
         }
+
+        #endregion
+
+        #region Position Witness Functions
 
         [WitnessFunction(nameof(Semantics.AbsPos), 1)]
         public DisjunctiveExamplesSpec WitnessK(GrammarRule rule, DisjunctiveExamplesSpec spec)
@@ -141,6 +186,8 @@ namespace SubstringSynthesis
             return DisjunctiveExamplesSpec.From(result);
         }
 
+        #endregion
+
         public DisjunctiveExamplesSpec WitnessID(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
@@ -169,6 +216,8 @@ namespace SubstringSynthesis
 
             return DisjunctiveExamplesSpec.From(result);
         }
+
+        #region Helper Methods
 
         private static IEnumerable<Regex> getMatches(string input, int output, List<string> ids, int len = 0)
         {
@@ -230,5 +279,7 @@ namespace SubstringSynthesis
 
             return true;
         }
+
+        #endregion
     }
 }

@@ -7,7 +7,9 @@ language Substring;
 
 @input string s;
 
-@start string program := SubstringPP(s, pos, pos) | SubstringPL(s, pos, l) | Date(s);
+@start string program := Concat(program, substring) | substring;
+
+string substring := SubstringPP(s, pos, pos) | SubstringPL(s, pos, l)
 
 int pos := AbsPos(s, k) | RelPosLeft(s, r) | RelPosRight(s, r)
 
