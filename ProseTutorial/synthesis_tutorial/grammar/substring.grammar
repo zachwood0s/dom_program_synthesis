@@ -1,0 +1,16 @@
+﻿using semantics ProseTutorial.Semantics;
+using learners ProseTutorial.WitnessFunctions;
+
+language Substring;
+
+@complete feature double Score = ProseTutorial.RankingScore;
+
+@input string v;
+
+@start string program := S;
+
+string S := Substring(v, pos, pos) | Cat(v, S) | v;
+
+int pos := AbsPos(v, k);
+
+int k; 

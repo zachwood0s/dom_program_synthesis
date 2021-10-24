@@ -1,0 +1,29 @@
+﻿using Microsoft.ProgramSynthesis.Wrangling.Tree;
+
+using semantics TreeManipulation.Semantics;
+using learners TreeManipulation.WitnessFunctions;
+
+language TreeManim;
+
+@complete feature double Score = TreeManipulation.RankingScore;
+
+@input Node tree;
+
+@start IReadOnlyList<Node> program := rule;
+
+IReadOnlyList<Node> rule := nodes
+						  | Selected(match, nodes) = Filter(\x: Node => match, nodes)
+
+IReadOnlyList<Node> nodes := Children(subTree)
+						   | Descendants(subTree)
+						   | Single(subTree)
+						
+
+Node subTree := tree
+			  | SelectChild(rule, k) = Kth(rule, k)
+
+bool match := MatchTag(x, tag)
+			| True()
+
+string tag;
+int k; 
