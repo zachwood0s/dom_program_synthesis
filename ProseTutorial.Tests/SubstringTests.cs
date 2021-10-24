@@ -11,18 +11,38 @@ using Microsoft.ProgramSynthesis.Learning.Strategies;
 using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.VersionSpace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SubstringSynthesis.Tests;
+using Tests.Utils;
 
 namespace SubstringSynthesis
 {
     [TestClass]
     public class SubstringTests
     {
+        private const string _GrammarPath = @"../../../../ProseTutorial/substring_synthesis/grammar/substring.grammar";
+        private static TestObject<string, string> testObject;
+
+        [ClassInitialize]
+        public static void Init(TestContext _)
+        {
+            testObject = new TestObject<string, string>(_GrammarPath);
+
+            testObject.Init(
+                g => new RankingScore(g),
+                g => new WitnessFunctions(g),
+                typeof(Semantics).GetTypeInfo().Assembly
+                );
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            testObject.Clear();
+        }
+
+
         [TestMethod]
         public void TestSubstringNumbers()
         {
-            TestObject testObject = new TestObject();
-
             testObject.CreateExample("After landing at 1270 ", "1270");
             testObject.CreateExample("1221 asdf", "1221");
 
@@ -37,8 +57,6 @@ namespace SubstringSynthesis
         [TestMethod]
         public void TestSubstringDate()
         {
-            TestObject testObject = new TestObject();
-
             testObject.CreateExample("asdf qe 11/01/1111 asdfasdf asde q", "11/01/1111");
             testObject.CreateExample(" 11-01-1111 asasdf asde q", "11-01-1111");
 
@@ -51,8 +69,6 @@ namespace SubstringSynthesis
         [TestMethod]
         public void TestSubstringPhoneNumbers()
         {
-            TestObject testObject = new TestObject();
-
             testObject.CreateExample("asdf qe (231) 231-1234 13411faad 123", "(231) 231-1234");
             testObject.CreateExample("as (111) 875-5678 ad 123", "(111) 875-5678");
 
@@ -64,8 +80,6 @@ namespace SubstringSynthesis
         [TestMethod]
         public void TestSubstringPrefix()
         {
-            TestObject testObject = new TestObject();
-
             testObject.CreateExample("asdfa fda Dr. Smith asdfa", "Dr. Smith");
             testObject.CreateExample("1;sdf Dr. jeff", "Dr. jeff");
 
