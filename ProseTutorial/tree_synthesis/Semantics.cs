@@ -46,9 +46,5 @@ namespace TreeManipulation
 
         public static bool True() => true;
 
-        public static bool Match(string n, string r)
-        {
-            return r.Equals(n);
-        }
     }
 }

@@ -59,7 +59,7 @@ namespace Tests.Utils
             Result<Grammar> grammar = compileGrammar(assemblies);
 
             if (grammar.HasErrors)
-                throw grammar.Exception;
+                throw new Exception("Grammar failed to compile");
 
 
             _grammar = grammar.Value;

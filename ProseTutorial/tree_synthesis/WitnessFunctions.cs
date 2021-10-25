@@ -6,6 +6,7 @@ using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Rules;
 using Microsoft.ProgramSynthesis.Specifications;
+using Microsoft.ProgramSynthesis.Utils;
 using Microsoft.ProgramSynthesis.Wrangling.Tree;
 
 namespace TreeManipulation
@@ -199,6 +200,36 @@ namespace TreeManipulation
                 else
                 {
                     result[inputState] = allLabels.Where(x => x != input.Label).ToList();
+                }
+            }
+            return new DisjunctiveExamplesSpec(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.MatchAttribute), 1)]
+        public DisjunctiveExamplesSpec WitnessMatchAttribute2(GrammarRule rule, ExampleSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+            foreach (KeyValuePair<State, object> example in spec.Examples)
+            {
+                State inputState = example.Key;
+                var input = inputState[rule.Body[0]] as Node;
+                var output = (bool) example.Value;
+
+                var allAttrs = (from x in new[] { inputState[Grammar.InputSymbol] as Node }.RecursiveSelect(x => x.Children)
+                               from a in x.Attributes.AllAttributes
+                               select a.Name).Distinct().ToHashSet();
+
+
+                var attrs = input.Attributes.AllAttributes.Select(x => x.Name).ToHashSet();
+
+                if (output)
+                {
+                    result[inputState] = attrs;
+                }
+                else
+                {
+                    allAttrs.ExceptWith(attrs);
+                    result[inputState] = allAttrs;
                 }
             }
             return new DisjunctiveExamplesSpec(result);

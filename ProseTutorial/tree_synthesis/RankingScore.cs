@@ -32,11 +32,14 @@ namespace TreeManipulation
         [FeatureCalculator("SelectChild")]
         public static double SelectChild(double x, double k) => x + k;
 
-        [FeatureCalculator("Selected")]
-        public static double Selected(double match, double rule) => match + rule; // Worse than just running the rule by itself
+        [FeatureCalculator("MatchNodes")]
+        public static double MatchNodes(double match, double rule) => match + rule; // Worse than just running the rule by itself
 
         [FeatureCalculator(nameof(Semantics.MatchTag))]
         public static double MatchTag(double node, double tag) => node + tag;
+
+        [FeatureCalculator(nameof(Semantics.MatchAttribute))]
+        public static double MatchAttribute(double node, double attr) => node + attr;
 
         [FeatureCalculator(nameof(Semantics.True))]
         public static double True() => discourage;
@@ -46,6 +49,14 @@ namespace TreeManipulation
 
         [FeatureCalculator("tag", Method = CalculationMethod.FromLiteral)]
         public static double ScoreTag(string tag) => 0;
+
+        [FeatureCalculator("attr", Method = CalculationMethod.FromLiteral)]
+        public static double ScoreAttr(string attr) => 0;
+
+        [FeatureCalculator("value", Method = CalculationMethod.FromLiteral)]
+        public static double ScoreValue(string value) => 0;
+
+
 
     }
 }

@@ -71,8 +71,7 @@ namespace TreeManipulation
 
                 // Expected results
                 TN("child1"),
-                TN("child2")
-                );
+                TN("child2"));
 
             testObject.CreateTestCase(
                 TN("parent",
@@ -83,8 +82,7 @@ namespace TreeManipulation
                 // Expected results
                 TN("child1"),
                 TN("child2",
-                    TN("child3"))
-                );
+                    TN("child3")));
 
             testObject.RunTest();
 
@@ -112,8 +110,8 @@ namespace TreeManipulation
                 // Expected results
                 TN("child1"),
                 TN("child2", TN("child3")),
-                TN("child3")
-                );
+                TN("child3"));
+
 
 
             testObject.CreateTestCase(
@@ -125,8 +123,7 @@ namespace TreeManipulation
                 // Expected results
                 TN("child1", TN("child3")),
                 TN("child3"),
-                TN("child2")
-                );
+                TN("child2"));
 
             testObject.RunTest();
         }
@@ -140,8 +137,7 @@ namespace TreeManipulation
                     TN("child2")),
 
                 // Expected results
-                TN("child2")
-                );
+                TN("child2"));
 
             testObject.CreateExample(
                 TN("parent",
@@ -150,8 +146,7 @@ namespace TreeManipulation
                         TN("child3"))),
 
                 // Expected results
-                TN("child2", TN("child3"))
-                );
+                TN("child2", TN("child3")));
 
             testObject.CreateTestCase(
                 TN("parent",
@@ -173,16 +168,14 @@ namespace TreeManipulation
                     TN("special"),
                     TN("child2")),
 
-                TN("special")
-                );
+                TN("special"));
 
             testObject.CreateExample(
                 TN("parent",
                     TN("child2",
                         TN("special"))),
 
-                TN("special")
-                );
+                TN("special"));
 
             testObject.CreateTestCase(
                 TN("parent",
@@ -191,8 +184,7 @@ namespace TreeManipulation
                         TN("special")),
                     TN("child2")),
 
-                TN("special")
-                );
+                TN("special"));
 
             testObject.RunTest();
         }
@@ -207,8 +199,7 @@ namespace TreeManipulation
                     TN("special2")),
 
                 TN("special1"),
-                TN("special2")
-                );
+                TN("special2"));
 
             testObject.CreateTestCase(
                 TN("parent",
@@ -221,10 +212,49 @@ namespace TreeManipulation
                 TN("child1", 
                     TN("child3"),
                     TN("special")),
-                TN("child3")
-                );
+                TN("child3"));
 
             testObject.RunTest();
         }
+
+        [TestMethod]
+        public void TestLearnAttribute()
+        {
+            var attrs1 = new Attributes(new Attributes.Attribute("id", "hello"));
+            var attrs2 = new Attributes(new Attributes.Attribute("id", "goodbye"), new Attributes.Attribute("eh", "eh"));
+            var attrs3 = new Attributes(new Attributes.Attribute("wrong", "wrong"));
+            testObject.CreateExample(
+                TN("parent",
+                    TN("special1", attrs3),
+                    TN("child2", attrs1),
+                    TN("special2", attrs2)),
+
+                TN("child2", attrs1),
+                TN("special2", attrs2));
+
+            testObject.CreateExample(
+                TN("parent",
+                    TN("special1", attrs1),
+                    TN("child2", attrs1),
+                    TN("special2", attrs2)),
+
+                TN("special1", attrs1),
+                TN("child2", attrs1),
+                TN("special2", attrs2));
+
+            testObject.CreateTestCase(
+                TN("parent",
+                    TN("child1", attrs3, 
+                        TN("child3"),
+                        TN("special", attrs3)),
+                    TN("child2", attrs1),
+                    TN("child3")),
+
+                TN("child2", attrs1));
+
+            testObject.RunTest();
+        }
+
+
     }
 }

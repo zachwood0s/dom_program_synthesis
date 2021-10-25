@@ -12,7 +12,7 @@ language TreeManim;
 @start IReadOnlyList<Node> program := rule;
 
 IReadOnlyList<Node> rule := Concat(rule, rule)
-						  | Selected(match, nodes) = Filter(\x: Node => match, nodes)
+						  | MatchNodes(match, nodes) = Filter(\x: Node => match, nodes)
 						  | nodes
 
 IReadOnlyList<Node> nodes := Children(subTree)
@@ -24,7 +24,10 @@ Node subTree := tree
 			  | SelectChild(rule, k) = Kth(rule, k)
 
 bool match := MatchTag(x, tag)
+			| MatchAttribute(x, attr)
 			| True()
 
 string tag;
+string attr;
+string value;
 int k; 
