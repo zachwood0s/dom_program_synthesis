@@ -14,6 +14,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Microsoft.ProgramSynthesis.Wrangling.Tree;
+using HtmlAgilityPack;
+using System.Xml.Linq;
+using TreeManipulation;
 
 namespace Tests.Utils
 {
@@ -155,6 +159,54 @@ namespace Tests.Utils
         public void CreateTestCase(TIn input, params TOut[] outs)
         {
             base.CreateTestCase(input, outs.ToList());
+        }
+    }
+
+    class HtmlSequenceTestObject: SequenceTestObject<ProseHtmlNode, ProseHtmlNode>
+    {
+        public HtmlSequenceTestObject(string grammar) 
+            : base(grammar) {}
+    }
+
+    class WebscrapeTestObject : TestObject<HtmlNode, IEnumerable<HtmlNode>>
+    {
+
+        public WebscrapeTestObject(string grammar)
+            : base(grammar) { }
+
+        public void CreateExample(string url, params string[] outs)
+        {
+            var node = ParseFromURL(url);
+            Console.WriteLine(node);
+        }
+
+        public void CreateTestCase(string url, params Node[] outs)
+        {
+        }
+
+        protected override void AssertTruth(IEnumerable<HtmlNode> expected, object actual)
+        {
+            Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
+        }
+
+        private Node ParseFromURL(string url)
+        {
+            var web = new HtmlWeb();
+            var doc = web.Load(url);
+            doc.OptionOutputAsXml = true;
+            var root = doc.DocumentNode;
+
+
+            using (StringWriter writer = new StringWriter())
+            {
+                doc.Save(writer);
+                using (StringReader reader = new StringReader(writer.ToString()))
+                {
+                    var xElement = XElement.Load(reader);
+                    return StructNode.DeserializeFromXml(xElement);
+                }
+            }
+
         }
     }
 }

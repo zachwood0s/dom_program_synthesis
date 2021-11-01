@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Rules;
@@ -25,22 +26,22 @@ namespace TreeManipulation
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
             {
                 State inputState = example.Key;
-                var possibilities = new List<IReadOnlyList<Node>>();
+                var possibilities = new List<IReadOnlyList<ProseHtmlNode>>();
 
                 int count = 0;
-                foreach (IReadOnlyList<Node> output in example.Value)
+                foreach (IReadOnlyList<ProseHtmlNode> output in example.Value)
                 {
                     for (var i = 0; i < output.Count - 1; i++)
                     {
-                        List<Node> temp = new List<Node>();
+                        var temp = new List<ProseHtmlNode>();
                         if (count == 0)
                         {
                             temp.Add(output[i]);
                         }
                         else
                         {
-                            IReadOnlyList<Node> previous = possibilities[count - 1];
-                            foreach (Node prev in previous)
+                            var previous = possibilities[count - 1];
+                            foreach (var prev in previous)
                             {
                                 temp.Add(prev);
                             }
@@ -52,7 +53,8 @@ namespace TreeManipulation
                         count++;
                     }
                 }
-                if (possibilities.Count == 0) return null;
+                if (possibilities.Count == 0) 
+                    return null;
                 result[inputState] = possibilities;
             }
             return new DisjunctiveExamplesSpec(result);
@@ -66,14 +68,14 @@ namespace TreeManipulation
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
             {
                 State inputState = example.Key;
-                var possibilities = new List<IReadOnlyList<Node>>();
+                var possibilities = new List<IReadOnlyList<ProseHtmlNode>>();
 
-                foreach(IReadOnlyList<Node> concat1List in startSpec.DisjunctiveExamples[inputState])
+                foreach(IReadOnlyList<ProseHtmlNode> concat1List in startSpec.DisjunctiveExamples[inputState])
                 {
-                    var temp = from output in example.Value
-                               from outNode in (IReadOnlyList<Node>)output
+                    var temp = (from output in example.Value
+                               from outNode in (IReadOnlyList<ProseHtmlNode>)output
                                where concat1List.All(x => !x.Equals(outNode))
-                               select outNode;
+                               select outNode).Distinct().ToList();
 
                     possibilities.Add(temp.ToList());
 
@@ -95,26 +97,27 @@ namespace TreeManipulation
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
             {
                 State inputState = example.Key;
-                var input = new[] { inputState[Grammar.InputSymbol] as Node };
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
 
-                var possibilities = new List<Node>();
-                foreach(IReadOnlyList<Node> output in example.Value)
+                var possibilities = new List<ProseHtmlNode>();
+                foreach(IReadOnlyList<ProseHtmlNode> output in example.Value)
                 {
-                    var occurrences = input.OfType<Node>()
-                                           .RecursiveSelect(x => x.Children)
-                                           .Where(x => x.Children.SequenceEqual(output))
+                    var occurrences = input.OfType<ProseHtmlNode>()
+                                           .RecursiveSelect(x => x.ChildNodes)
+                                           .Where(x => x.ChildNodes.SequenceEqual(output))
                                            .ToList();
                     possibilities.AddRange(occurrences);
 
                 }
                 
-                if (possibilities.Count == 0) return null;
+                if (possibilities.Count == 0) 
+                    return null;
                 result[inputState] = possibilities;
             }
             return new DisjunctiveExamplesSpec(result);
         }
 
-        [WitnessFunction(nameof(Semantics.Descendants), 0, Verify = true)]
+        [WitnessFunction(nameof(Semantics.Descendants), 0)]
         public DisjunctiveExamplesSpec WitnessDescendants(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
@@ -122,20 +125,20 @@ namespace TreeManipulation
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
             {
                 State inputState = example.Key;
-                var input = new[] { inputState[Grammar.InputSymbol] as Node };
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
 
-                var occList = new List<Node>();
-                foreach (IReadOnlyList<Node> output in example.Value)
+                var occList = new List<ProseHtmlNode>();
+                foreach (IReadOnlyList<ProseHtmlNode> output in example.Value)
                 {
-                    var occurrences = from i in input.RecursiveSelect(x => x.Children)
-                                      let set = new HashSet<object>(Semantics.Descendants(i))
+                    var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
                                       where Semantics.Descendants(i).SequenceEqual(output)
                                       select i;
 
                     occList.AddRange(occurrences);
                 }
                 
-                if (occList.Count == 0) return null;
+                if (occList.Count == 0) 
+                    return null;
                 result[inputState] = occList;
             }
             return new DisjunctiveExamplesSpec(result);
@@ -148,17 +151,20 @@ namespace TreeManipulation
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
             {
                 State inputState = example.Key;
-                var input = new[] { inputState[Grammar.InputSymbol] as Node };
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
 
-                var possibilites = new List<Node>();
-                foreach (IReadOnlyList<Node> output in example.Value)
+                var possibilites = new List<ProseHtmlNode>();
+                foreach (IReadOnlyList<ProseHtmlNode> output in example.Value)
                 {
                     if (output.Count > 1) return null; // Not possible to make a node into more than one element
-                    var occurrences = input.RecursiveSelect(x => x.Children).Where(x => x.Equals(output[0])).ToList();
+                    var occurrences = input.RecursiveSelect(x => x.ChildNodes)
+                                           .Where(x => x.Equals(output[0]))
+                                           .ToList();
                     possibilites.AddRange(occurrences);
                 }
 
-                if (possibilites.Count == 0) return null;
+                if (possibilites.Count == 0) 
+                    return null;
                 result[inputState] = possibilites;
             }
             return new DisjunctiveExamplesSpec(result);
@@ -187,19 +193,20 @@ namespace TreeManipulation
             foreach (KeyValuePair<State, object> example in spec.Examples)
             {
                 State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as Node;
+                var input = inputState[rule.Body[0]] as ProseHtmlNode;
                 var output = (bool) example.Value;
 
-                var allLabels = new[] { inputState[Grammar.InputSymbol] as Node }.RecursiveSelect(x => x.Children)
-                                                                                 .Select(x => x.Label).ToList();
+                var allLabels = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode }
+                                    .RecursiveSelect(x => x.ChildNodes)
+                                    .Select(x => x.Name).ToList();
 
                 if (output)
                 {
-                    result[inputState] = new[] { input.Label };
+                    result[inputState] = new[] { input.Name };
                 }
                 else
                 {
-                    result[inputState] = allLabels.Where(x => x != input.Label).ToList();
+                    result[inputState] = allLabels.Where(x => x != input.Name).ToList();
                 }
             }
             return new DisjunctiveExamplesSpec(result);
@@ -212,15 +219,16 @@ namespace TreeManipulation
             foreach (KeyValuePair<State, object> example in spec.Examples)
             {
                 State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as Node;
+                var input = inputState[rule.Body[0]] as ProseHtmlNode;
                 var output = (bool) example.Value;
 
-                var allAttrs = (from x in new[] { inputState[Grammar.InputSymbol] as Node }.RecursiveSelect(x => x.Children)
-                               from a in x.Attributes.AllAttributes
+                var allAttrs = (from x in new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode }
+                                    .RecursiveSelect(x => x.ChildNodes)
+                               from a in x.Attributes
                                select a.Name).Distinct().ToHashSet();
 
 
-                var attrs = input.Attributes.AllAttributes.Select(x => x.Name).ToHashSet();
+                var attrs = input.Attributes.Select(x => x.Name).ToHashSet();
 
                 if (output)
                 {
@@ -277,6 +285,21 @@ namespace TreeManipulation
                     enumerator.Dispose();
                 }
             }
+        }
+
+        public static bool NodeSequenceEqual(this IEnumerable<HtmlNode> a, IEnumerable<HtmlNode> b)
+        {
+            if (a.Count() != b.Count())
+                return false;
+
+            foreach (var (nodeA, nodeB) in a.Zip(b, Tuple.Create))
+            {
+                if (!Semantics.NodeEquivalent(nodeA, nodeB))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

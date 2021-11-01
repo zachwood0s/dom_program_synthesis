@@ -3,48 +3,70 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.ProgramSynthesis.Wrangling.Tree;
+using HtmlAgilityPack;
 
 namespace TreeManipulation
 {
     public static class Semantics
     {
 
-        public static IReadOnlyList<Node> Concat(IReadOnlyList<Node> a, IReadOnlyList<Node> b)
+        public static IReadOnlyList<ProseHtmlNode> Concat(IReadOnlyList<ProseHtmlNode> a, IReadOnlyList<ProseHtmlNode> b)
             => a.Concat(b).ToList();
-        public static IReadOnlyList<Node> Children(Node node)
+        public static IReadOnlyList<ProseHtmlNode> Children(ProseHtmlNode node)
         {
-            return node.Children;
+            return node.ChildNodes.ToList();
         }
 
-        public static IReadOnlyList<Node> Descendants(Node node)
+        public static IReadOnlyList<ProseHtmlNode> Descendants(ProseHtmlNode node)
         {
-            return (from c in node.Children
-                   from d in new[] { c }.RecursiveSelect(x => x.Children)
-                   select d).ToList();
+            return node.Descendants.ToList();         
         }
 
-        public static IReadOnlyList<Node> Single(Node node)
+        public static IReadOnlyList<ProseHtmlNode> Single(ProseHtmlNode node)
         {
-            return new List<Node>{node};
+            return new List<ProseHtmlNode>{node};
         }
 
-        public static bool MatchTag(Node n, string tag)
+        public static bool MatchTag(ProseHtmlNode n, string tag)
         {
-            return n.Label.Equals(tag);
+            return n.Name.Equals(tag);
         }
 
-        public static bool MatchAttribute(Node n, string attr)
+        public static bool MatchAttribute(ProseHtmlNode n, string attr)
         {
-            return n.Attributes.TryGetValue(attr, out var _);
+            return n[attr] != null;
         }
 
-        public static bool MatchAttributeValue(Node n, string attr, string value)
+        public static bool MatchAttributeValue(ProseHtmlNode n, string attr, string value)
         {
-            var hasAttr = n.Attributes.TryGetValue(attr, out var actualVal);
-            return hasAttr ? actualVal.Equals(value) : false;
+            var attrVal = n[attr]?.Value;
+            return attrVal != null ? attrVal.Equals(value) : false;
         }
 
         public static bool True() => true;
+
+        public static bool NodeEquivalent(HtmlNode a, HtmlNode b)
+        {
+            if (a.Name != b.Name) return false;
+
+            foreach(var attr in a.Attributes)
+            {
+                if (attr.Value != b.Attributes[attr.Name]?.Value)
+                    return false;
+            }
+
+            if (a.ChildNodes.Count != b.ChildNodes.Count)
+                return false;
+
+            foreach (var (childA, childB) in a.ChildNodes.Zip(b.ChildNodes, Tuple.Create))
+            {
+                if(!NodeEquivalent(childA, childB))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
     }
 }
