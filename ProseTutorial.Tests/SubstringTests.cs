@@ -80,12 +80,12 @@ namespace SubstringSynthesis
         [TestMethod]
         public void TestConcat()
         {
-            TestObject testObject = new TestObject();
+            //testObject.CreateExample("1----a", "1a");
+            //testObject.CreateExample("1-------b", "1b");
+            testObject.CreateExample("12---ab", "12ab");
+            //testObject.CreateExample("123---abc", "123abc");
 
-            testObject.CreateExample("1-2-3", "123");
-            testObject.CreateExample("aa-b-c", "aabc");
-
-            testObject.CreateTestCase("3-2-1", "321");
+            //testObject.CreateTestCase("12", "321");
 
             testObject.RunTest();
         }

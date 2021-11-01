@@ -7,7 +7,9 @@ language Substring;
 
 @input string s;
 
-@start string program := Concat(program, substring) | substring;
+@start string program := cat;
+
+string cat := substring
 
 string substring := SubstringPP(s, pos, pos) | SubstringPL(s, pos, l)
 
