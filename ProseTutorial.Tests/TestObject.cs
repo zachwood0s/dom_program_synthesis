@@ -59,7 +59,7 @@ namespace Tests.Utils
             Result<Grammar> grammar = compileGrammar(assemblies);
 
             if (grammar.HasErrors)
-                throw grammar.Exception;
+                throw new Exception("Grammar failed to compile");
 
 
             _grammar = grammar.Value;
@@ -79,6 +79,8 @@ namespace Tests.Utils
             if (programs.Count() == 0)
                 Assert.Fail("No programs were learned.");
 
+            Console.WriteLine($"Picking best program: {programs.First()}");
+
             foreach(var example in Examples)
             {
                 runRealizedProgramWith(programs.First(), _grammar, example.Item1, example.Item2);
@@ -93,8 +95,7 @@ namespace Tests.Utils
         private void runRealizedProgramWith(ProgramNode program, Grammar grammar, TIn input, TOut output)
         {
             State state = State.CreateForExecution(grammar.InputSymbol, input);
-            var programOutput = program.Invoke(state) as TOut;
-            AssertTruth(output, programOutput);
+            AssertTruth(output, program.Invoke(state));
         }
 
         private ExampleSpec getExampleSpec(Grammar grammar)
@@ -127,9 +128,10 @@ namespace Tests.Utils
             });
         }
 
-        protected virtual void AssertTruth(TOut expected, TOut actual)
+        protected virtual void AssertTruth(TOut expected, object actual)
         {
-            Assert.AreEqual(expected, actual);
+
+            Assert.AreEqual(expected, actual as TOut);
         }
     }
 
@@ -141,18 +143,18 @@ namespace Tests.Utils
         public SequenceTestObject(string grammar) 
             : base(grammar) {}
 
-        protected override void AssertTruth(IEnumerable<TOut> expected, IEnumerable<TOut> actual)
+        protected override void AssertTruth(IEnumerable<TOut> expected, object actual)
         {
-            Assert.IsTrue(expected.SequenceEqual(actual));
+            Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
         }
 
         public void CreateExample(TIn input, params TOut[] outs)
         {
-            base.CreateExample(input, outs);
+            base.CreateExample(input, outs.ToList());
         }
         public void CreateTestCase(TIn input, params TOut[] outs)
         {
-            base.CreateExample(input, outs);
+            base.CreateTestCase(input, outs.ToList());
         }
     }
 }

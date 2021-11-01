@@ -8,6 +8,9 @@ namespace TreeManipulation
 {
     public static class Semantics
     {
+
+        public static IReadOnlyList<Node> Concat(IReadOnlyList<Node> a, IReadOnlyList<Node> b)
+            => a.Concat(b).ToList();
         public static IReadOnlyList<Node> Children(Node node)
         {
             return node.Children;
@@ -43,9 +46,5 @@ namespace TreeManipulation
 
         public static bool True() => true;
 
-        public static bool Match(string n, string r)
-        {
-            return r.Equals(n);
-        }
     }
 }
