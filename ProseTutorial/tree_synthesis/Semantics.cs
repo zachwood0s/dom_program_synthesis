@@ -19,7 +19,7 @@ namespace TreeManipulation
 
         public static IReadOnlyList<ProseHtmlNode> Descendants(ProseHtmlNode node)
         {
-            return node.Descendants.ToList();         
+            return node.Descendants.ToList();
         }
 
         public static IReadOnlyList<ProseHtmlNode> Single(ProseHtmlNode node)

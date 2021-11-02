@@ -168,7 +168,7 @@ namespace Tests.Utils
             : base(grammar) {}
     }
 
-    class WebscrapeTestObject : TestObject<HtmlNode, IEnumerable<HtmlNode>>
+    class WebscrapeTestObject : SequenceTestObject<ProseHtmlNode, ProseHtmlNode>
     {
 
         public WebscrapeTestObject(string grammar)
@@ -177,36 +177,37 @@ namespace Tests.Utils
         public void CreateExample(string url, params string[] outs)
         {
             var node = ParseFromURL(url);
-            Console.WriteLine(node);
+            var outNodes = outs.Select(ParseFromString).ToList();
+            CreateExample(node, outNodes);
         }
 
-        public void CreateTestCase(string url, params Node[] outs)
+        public void CreateTestCase(string url, params string[] outs)
         {
+            var node = ParseFromURL(url);
+            var outNodes = outs.Select(ParseFromString).ToList();
+            CreateTestCase(node, outNodes);
         }
 
-        protected override void AssertTruth(IEnumerable<HtmlNode> expected, object actual)
+        protected override void AssertTruth(IEnumerable<ProseHtmlNode> expected, object actual)
         {
             Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
         }
 
-        private Node ParseFromURL(string url)
+        private ProseHtmlNode ParseFromString(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            return ProseHtmlNode.DeserializeFromHtmlNode(doc.DocumentNode.FirstChild);
+        }
+
+        private ProseHtmlNode ParseFromURL(string url)
         {
             var web = new HtmlWeb();
             var doc = web.Load(url);
             doc.OptionOutputAsXml = true;
             var root = doc.DocumentNode;
 
-
-            using (StringWriter writer = new StringWriter())
-            {
-                doc.Save(writer);
-                using (StringReader reader = new StringReader(writer.ToString()))
-                {
-                    var xElement = XElement.Load(reader);
-                    return StructNode.DeserializeFromXml(xElement);
-                }
-            }
-
+            return ProseHtmlNode.DeserializeFromHtmlNode(root.SelectSingleNode("html"));
         }
     }
 }

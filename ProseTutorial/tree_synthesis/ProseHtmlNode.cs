@@ -13,6 +13,7 @@ namespace TreeManipulation
 
         public string Name => _name;
         public string Value => _value;
+        private int? _cachedHashCode;
 
         public ProseAttribute(string name, string value)
         {
@@ -35,23 +36,41 @@ namespace TreeManipulation
         }
         public override int GetHashCode()
         {
-            int hash = 13;
-            hash = hash * 7 + _name.GetHashCode();
-            hash = hash * 7 + _value.GetHashCode();
-            return hash;
+            if(!_cachedHashCode.HasValue)
+            {
+                int hash = 13;
+                hash = hash * 7 + _name.GetHashCode();
+                hash = hash * 7 + _value.GetHashCode();
+                _cachedHashCode = hash;
+            }
+            return _cachedHashCode.Value;
+        }
+
+        public override string ToString()
+        {
+            return $"{_name}: {_value}";
         }
 
     }
 
     public class ProseHtmlNode
     {
+        private ProseHtmlNode _parent;
         private List<ProseHtmlNode> _childNodes;
         private Dictionary<string, ProseAttribute> _attributes;
         private string _name;
+        private HtmlNodeType _type;
+        private string _text;
+        private int _line;
+        private int _col;
+        private int? _cachedHashCode;
 
         public IReadOnlyList<ProseHtmlNode> ChildNodes => _childNodes;
         public IEnumerable<ProseAttribute> Attributes => _attributes.Values;
+
         public string Name => _name;
+        public HtmlNodeType Type => _type;
+        public string Text => _text;
 
         public IEnumerable<ProseHtmlNode> Descendants 
             => _childNodes.RecursiveSelect(x => x.ChildNodes);
@@ -69,17 +88,43 @@ namespace TreeManipulation
 
         public static ProseHtmlNode DeserializeFromHtmlNode(HtmlNode node)
         {
-            var newNode = new ProseHtmlNode(node.Name);
+            var newNode = DeserializeFromHtmlNode(node, null);
 
-            foreach(var attr in node.Attributes)
+            newNode.RemoveDuplicates();
+            return newNode;
+        }
+
+        private static ProseHtmlNode DeserializeFromHtmlNode(HtmlNode node, ProseHtmlNode parent)
+        {
+            if(node.NodeType == HtmlNodeType.Comment)
+            {
+                return null;
+            }
+
+            var newNode = new ProseHtmlNode(node.Name)
+            {
+                _type = node.NodeType,
+                _parent = parent
+            };
+
+            if(node is HtmlTextNode textNode)
+            {
+                newNode._text = textNode.Text;
+            }
+
+            foreach (var attr in node.Attributes)
             {
                 newNode._attributes[attr.Name] = ProseAttribute.DeserializeFromHtmlAttribute(attr);
             }
 
             var children = from c in node.ChildNodes
-                           select DeserializeFromHtmlNode(c);
+                           where c.NodeType != HtmlNodeType.Comment
+                           select DeserializeFromHtmlNode(c, newNode);
 
             newNode._childNodes.AddRange(children);
+
+            newNode._line = node.Line;
+            newNode._col = node.LinePosition;
 
             return newNode;
         }
@@ -89,7 +134,18 @@ namespace TreeManipulation
             if (!(obj is ProseHtmlNode other))
                 return false;
 
+            // If the hash codes aren't the same, then immediately exit.
+            // Hashcode calculation is quicker and is cached
+            if (GetHashCode() != other.GetHashCode())
+                return false;
+
             if (Name != other.Name) return false;
+
+            if (Text != null && !Text.Equals(other.Text))
+                return false;
+
+            if (Attributes.Count() != other.Attributes.Count())
+                return false;
 
             foreach(var attr in Attributes)
             {
@@ -112,18 +168,59 @@ namespace TreeManipulation
 
         public override int GetHashCode()
         {
-            int hash = 13;
-            hash = (hash * 7) + _name.GetHashCode();
-            foreach(var attr in Attributes)
-            {
-                hash = (hash * 7) + attr.GetHashCode();
+            if (!_cachedHashCode.HasValue)
+            { 
+                int hash = 13;
+                hash = (hash * 7) + _name.GetHashCode();
+                foreach (var attr in Attributes)
+                {
+                    hash = (hash * 7) + attr.GetHashCode();
+                }
+
+                foreach (var child in ChildNodes)
+                {
+                    hash = (hash * 7) + child.GetHashCode();
+                }
+
+                if (_text != null)
+                    hash = (hash * 7) + _text.GetHashCode();
+                _cachedHashCode = hash;
             }
 
-            foreach(var child in ChildNodes)
+            return _cachedHashCode.Value;
+        }
+
+        public override string ToString()
+        {
+            return $"{Name}: Ln {_line} Col {_col}";
+        }
+
+        public void RemoveDuplicates()
+        {
+            var allNodes = Descendants.ToList();
+            var seen = new HashSet<ProseHtmlNode>();
+            var count = 0;
+
+            foreach(var n in allNodes)
             {
-                hash = (hash * 7) + child.GetHashCode();
+                if(seen.Contains(n))
+                {
+                    if(n._parent != null)
+                    {
+                        n._parent._childNodes.Remove(n);
+                        count++;
+                    }
+                    else
+                    {
+                        throw new Exception("Duplicate node has no parent");
+                    }
+                }
+                else
+                {
+                    seen.Add(n);
+                }
             }
-            return hash;
+            Console.WriteLine($"Removed {count} duplicates");
         }
     }
 }

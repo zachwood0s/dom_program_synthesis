@@ -112,7 +112,7 @@ namespace TreeManipulation
                 
                 if (possibilities.Count == 0) 
                     return null;
-                result[inputState] = possibilities;
+                result[inputState] = possibilities.Distinct().ToList();
             }
             return new DisjunctiveExamplesSpec(result);
         }
@@ -139,7 +139,7 @@ namespace TreeManipulation
                 
                 if (occList.Count == 0) 
                     return null;
-                result[inputState] = occList;
+                result[inputState] = occList.Distinct().ToList();
             }
             return new DisjunctiveExamplesSpec(result);
         }
@@ -165,7 +165,7 @@ namespace TreeManipulation
 
                 if (possibilites.Count == 0) 
                     return null;
-                result[inputState] = possibilites;
+                result[inputState] = possibilites.Distinct().ToList();
             }
             return new DisjunctiveExamplesSpec(result);
         }
@@ -206,7 +206,7 @@ namespace TreeManipulation
                 }
                 else
                 {
-                    result[inputState] = allLabels.Where(x => x != input.Name).ToList();
+                    result[inputState] = allLabels.Where(x => x != input.Name).Distinct().ToList();
                 }
             }
             return new DisjunctiveExamplesSpec(result);
