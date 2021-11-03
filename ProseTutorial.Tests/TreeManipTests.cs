@@ -146,18 +146,50 @@ namespace TreeManipulation
 
             testObject.RunTest();
         }
+        [TestMethod]
+        public void TestLearnKthChildChildren()
+        {
+            testObject.CreateExample(
+                Html("<parent><child1/><child2><this/><that/></child2></parent>"),
+
+                // Expected results
+                Html("<this/>"),
+                Html("<that/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><no/><p><yes1/><yes2/></p></parent>"),
+
+                // Expected results
+                Html("<yes1>"),
+                Html("<yes2>"));
+
+            testObject.RunTest();
+        }
 
         [TestMethod]
         public void TestLearnKthChildByTag()
         {
+            // Failing, expect something like:
+            // Single(SelectChild(MatchNodes(MatchTag(x, "child1"), Descendants(tree)), 0));
             testObject.CreateExample(
-                Html("<parent><childNot/><child1 id='this one'/><child1/><child3/></parent>"),
+                Html(@"<parent>
+                        <childNot/>
+                        <child1 id='this one'/>
+                        <child1/>
+                        <child3/>
+                       </parent>"),
 
                 // Expected results
                 Html("<child1 id='this one'/>"));
 
             testObject.CreateExample(
-                Html("<parent><nope><childNot/><child1 class='that one'/></nope><child1 id='last'/></parent>"),
+                Html(@"<parent>
+                        <nope>
+                            <childNot/>
+                            <child1 class='that one'/>
+                        </nope>
+                        <child1 id='last'/>
+                       </parent>"),
 
                 // Expected results
                 Html("<child1 class='that one'/>"));
@@ -169,6 +201,8 @@ namespace TreeManipulation
                 Html("<child1 id='first'/>"));
 
             testObject.RunTest();
+
+
         }
 
         [TestMethod]

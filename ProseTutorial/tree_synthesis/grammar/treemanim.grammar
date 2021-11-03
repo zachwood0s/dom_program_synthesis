@@ -20,7 +20,6 @@ IReadOnlyList<ProseHtmlNode> nodes
 	:= Children(subTree)
      | Descendants(subTree)
 	 | Single(subTree)
-						
 
 ProseHtmlNode subTree 
 	:= tree
@@ -35,3 +34,4 @@ string tag;
 string attr;
 string value;
 int k; 
+

@@ -266,13 +266,6 @@ namespace TreeManipulation
             }
             return new DisjunctiveExamplesSpec(result);
         }
-
-        [WitnessFunction("SelectChild", 1, DependsOnParameters = new[] { 0 })]
-        public ExampleSpec WitnessKth(GrammarRule rule, DisjunctiveExamplesSpec spec, DisjunctiveExamplesSpec startSpec)
-        {
-            var result = new Dictionary<State, object>();
-            return new ExampleSpec(result);
-        }
     }
 
 
