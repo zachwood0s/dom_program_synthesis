@@ -14,6 +14,29 @@ namespace TreeManipulation
 {
     public class WitnessFunctions : DomainLearningLogic
     {
+        public class CachedCalculation<TIn, TOut>
+            where TOut: class
+        {
+            private Dictionary<TIn, TOut> _cachedValues;
+            private Func<TIn, TOut> _calcFunc;
+
+            public CachedCalculation(Func<TIn, TOut> calcFunc)
+            {
+                _calcFunc = calcFunc;
+                _cachedValues = new Dictionary<TIn, TOut>();
+            }
+            public TOut GetValue(TIn inputState)
+            {
+                if(_cachedValues.TryGetValue(inputState, out var res))
+                {
+                    return res;
+                }
+                var newVal = _calcFunc(inputState);
+                _cachedValues[inputState] = newVal;
+                return newVal;
+            }
+        };
+
         public WitnessFunctions(Grammar grammar) : base(grammar)
         {
         }
@@ -80,8 +103,6 @@ namespace TreeManipulation
                     possibilities.Add(temp.ToList());
 
                 }
-                //var output = example.Value as IReadOnlyList<object>;
-                //var input = startSpec.DisjunctiveExamples[inputState];
                 result[inputState] = possibilities;
 
             }
@@ -156,7 +177,8 @@ namespace TreeManipulation
                 var possibilites = new List<ProseHtmlNode>();
                 foreach (IReadOnlyList<ProseHtmlNode> output in example.Value)
                 {
-                    if (output.Count > 1) return null; // Not possible to make a node into more than one element
+                    if (output.Count > 1) 
+                        return null; // Not possible to make a node into more than one element
                     var occurrences = input.RecursiveSelect(x => x.ChildNodes)
                                            .Where(x => x.Equals(output[0]))
                                            .ToList();
@@ -171,20 +193,12 @@ namespace TreeManipulation
         }
 
 
-        /*
-        [WitnessFunction(nameof(Semantics.MatchTag), 0)]
-        public DisjunctiveExamplesSpec WitnessMatchTag1(GrammarRule rule, ExampleSpec spec)
-        {
-            var result = new Dictionary<State, IEnumerable<object>>();
-            foreach (KeyValuePair<State, object> example in spec.Examples)
-            {
-                State inputState = example.Key;
-                var input = new[] { inputState[Grammar.InputSymbol] as Node };
-                result[inputState] = input.RecursiveSelect(x => x.Children).ToList();
-            }
-            return new DisjunctiveExamplesSpec(result);
-        }
-        */
+        private CachedCalculation<ProseHtmlNode, HashSet<string>> allLabels
+            = new CachedCalculation<ProseHtmlNode, HashSet<string>>( 
+                input => new[] { input }.RecursiveSelect(x => x.ChildNodes)
+                                        .Select(x => x.Name)
+                                        .ToHashSet()
+            );
 
         [WitnessFunction(nameof(Semantics.MatchTag), 1)]
         public DisjunctiveExamplesSpec WitnessMatchTag2(GrammarRule rule, ExampleSpec spec)
@@ -196,21 +210,31 @@ namespace TreeManipulation
                 var input = inputState[rule.Body[0]] as ProseHtmlNode;
                 var output = (bool) example.Value;
 
-                var allLabels = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode }
-                                    .RecursiveSelect(x => x.ChildNodes)
-                                    .Select(x => x.Name).ToList();
+                // Find all of the possible labels in the given input tree
+                var labels = allLabels.GetValue(inputState[Grammar.InputSymbol] as ProseHtmlNode);
 
                 if (output)
                 {
+                    // If this node is supposed to be included in the output, 
+                    // then the only possible label is the node's
                     result[inputState] = new[] { input.Name };
                 }
                 else
                 {
-                    result[inputState] = allLabels.Where(x => x != input.Name).Distinct().ToList();
+                    // If this node is not supposed to be included in the output,
+                    // then the possible labels include every label except the node's
+                    result[inputState] = labels.Where(x => x != input.Name).ToHashSet();
                 }
             }
             return new DisjunctiveExamplesSpec(result);
         }
+
+        private CachedCalculation<ProseHtmlNode, HashSet<ProseAttribute>> allAttributes
+            = new CachedCalculation<ProseHtmlNode, HashSet<ProseAttribute>>( 
+                input => new[] { input }.RecursiveSelect(x => x.ChildNodes)
+                                        .SelectMany(x => x.Attributes)
+                                        .ToHashSet()
+            );
 
         [WitnessFunction(nameof(Semantics.MatchAttribute), 1)]
         public DisjunctiveExamplesSpec WitnessMatchAttribute2(GrammarRule rule, ExampleSpec spec)
@@ -222,27 +246,35 @@ namespace TreeManipulation
                 var input = inputState[rule.Body[0]] as ProseHtmlNode;
                 var output = (bool) example.Value;
 
-                var allAttrs = (from x in new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode }
-                                    .RecursiveSelect(x => x.ChildNodes)
-                               from a in x.Attributes
-                               select a.Name).Distinct().ToHashSet();
-
-
+                // Find all possible attributes in the tree
+                var allAttrs = allAttributes.GetValue(inputState[Grammar.InputSymbol] as ProseHtmlNode);
+                var allAttrNames = allAttrs.Select(x => x.Name);
                 var attrs = input.Attributes.Select(x => x.Name).ToHashSet();
 
                 if (output)
                 {
+                    // If this node is supposed to be included in the output,
+                    // then the only possible set of attributes is this node's attrs
                     result[inputState] = attrs;
                 }
                 else
                 {
-                    allAttrs.ExceptWith(attrs);
-                    result[inputState] = allAttrs;
+                    // If this node is not supposed to be included in the output,
+                    // then the possible labels include every other attribute found in the tree
+                    result[inputState] = allAttrNames.Where(x => !attrs.Contains(x)).ToHashSet();
                 }
             }
             return new DisjunctiveExamplesSpec(result);
         }
+
+        [WitnessFunction("SelectChild", 1, DependsOnParameters = new[] { 0 })]
+        public ExampleSpec WitnessKth(GrammarRule rule, DisjunctiveExamplesSpec spec, DisjunctiveExamplesSpec startSpec)
+        {
+            var result = new Dictionary<State, object>();
+            return new ExampleSpec(result);
+        }
     }
+
 
     public static class IEnumerableExtensions
     {

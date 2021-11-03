@@ -133,16 +133,40 @@ namespace TreeManipulation
                 Html("<child2/>"));
 
             testObject.CreateExample(
-                Html("<parent><child1/><child2><child3/></child2></parent>"),
+                Html("<parent><child1/><childImportant><child3/></childImportant></parent>"),
 
                 // Expected results
-                Html("<child2><child3/></child2>"));
+                Html("<childImportant><child3/></childImportant>"));
 
             testObject.CreateTestCase(
                 Html("<parent><child1><child3/></child1><secondChild/></parent>"),
 
                 // Expected results
                 Html("<secondChild>"));
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestLearnKthChildByTag()
+        {
+            testObject.CreateExample(
+                Html("<parent><childNot/><child1 id='this one'/><child1/><child3/></parent>"),
+
+                // Expected results
+                Html("<child1 id='this one'/>"));
+
+            testObject.CreateExample(
+                Html("<parent><nope><childNot/><child1 class='that one'/></nope><child1 id='last'/></parent>"),
+
+                // Expected results
+                Html("<child1 class='that one'/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><child2/><nope><nope><child1 id='first'/><child1/></nope></nope></parent>"),
+
+                // Expected results
+                Html("<child1 id='first'/>"));
 
             testObject.RunTest();
         }
