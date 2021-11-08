@@ -1,4 +1,4 @@
-﻿using Microsoft.ProgramSynthesis.Wrangling.Tree;
+﻿using TreeManipulation;
 
 using semantics TreeManipulation.Semantics;
 using learners TreeManipulation.WitnessFunctions;
@@ -7,27 +7,31 @@ language TreeManim;
 
 @complete feature double Score = TreeManipulation.RankingScore;
 
-@input Node tree;
+@input ProseHtmlNode tree;
 
-@start IReadOnlyList<Node> program := rule;
+@start IReadOnlyList<ProseHtmlNode> program := rule;
 
-IReadOnlyList<Node> rule := Concat(rule, rule)
-						  | MatchNodes(match, nodes) = Filter(\x: Node => match, nodes)
-						  | nodes
+IReadOnlyList<ProseHtmlNode> rule :=
+	:= Concat(rule, rule)
+	 | MatchNodes(match, nodes) = Filter(\x: ProseHtmlNode => match, nodes)
+	 | nodes
 
-IReadOnlyList<Node> nodes := Children(subTree)
-						   | Descendants(subTree)
-						   | Single(subTree)
-						
+IReadOnlyList<ProseHtmlNode> nodes 
+	:= Children(subTree)
+     | Descendants(subTree)
+	 | Single(subTree)
 
-Node subTree := tree
-			  | SelectChild(rule, k) = Kth(rule, k)
+ProseHtmlNode subTree 
+	:= tree
+	 | SelectChild(rule, k) = Kth(rule, k)
 
-bool match := MatchTag(x, tag)
-			| MatchAttribute(x, attr)
-			| True()
+bool match 
+	:= MatchTag(x, tag)
+	 | MatchAttribute(x, attr)
+	 | True()
 
 string tag;
 string attr;
 string value;
 int k; 
+

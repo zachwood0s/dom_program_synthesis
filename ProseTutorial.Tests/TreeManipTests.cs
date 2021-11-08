@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using HtmlAgilityPack;
 using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.AST;
 using Microsoft.ProgramSynthesis.Compiler;
@@ -22,7 +23,7 @@ namespace TreeManipulation
     public class TreeManipTest
     {
         private const string _GrammarPath = @"../../../../ProseTutorial/tree_synthesis/grammar/treemanim.grammar";
-        private static SequenceTestObject<Node, Node> testObject;
+        private static HtmlSequenceTestObject testObject;
 
         private static StructNode TN(string label)
         {
@@ -42,16 +43,23 @@ namespace TreeManipulation
             return n;
         }
 
+        private static ProseHtmlNode Html(string htmlText)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(htmlText);
+            return ProseHtmlNode.DeserializeFromHtmlNode(doc.DocumentNode.FirstChild);
+        }
+
         [ClassInitialize]
         public static void Init(TestContext _)
         {
-            testObject = new SequenceTestObject<Node, Node>(_GrammarPath);
+            testObject = new HtmlSequenceTestObject(_GrammarPath);
 
             testObject.Init(
                 g => new RankingScore(g),
                 g => new WitnessFunctions(g),
                 typeof(Semantics).GetTypeInfo().Assembly,
-                typeof(Node).GetTypeInfo().Assembly
+                typeof(ProseHtmlNode).GetTypeInfo().Assembly
                 ) ;
         }
 
@@ -65,24 +73,20 @@ namespace TreeManipulation
         public void TestLearnChildren()
         {
             testObject.CreateExample(
-                TN("parent",
-                    TN("child1"),
-                    TN("child2")),
+                Html("<parent><child1/><child2/></parent>"),
 
                 // Expected results
-                TN("child1"),
-                TN("child2"));
+                Html("<child1/>"),
+                Html("<child2/>")
+                );
 
             testObject.CreateTestCase(
-                TN("parent",
-                    TN("child1"),
-                    TN("child2", 
-                        TN("child3"))),
+                Html("<parent><child1/><child2><child3/></child2></parent>"),
 
                 // Expected results
-                TN("child1"),
-                TN("child2",
-                    TN("child3")));
+                Html("<child1/>"),
+                Html("<child2><child3/></child2>")
+                );
 
             testObject.RunTest();
 
@@ -91,39 +95,32 @@ namespace TreeManipulation
         [TestMethod]
         public void TestLearnDescendants()
         {
+            /*
             testObject.CreateExample(
-                TN("parent",
-                    TN("child1"),
-                    TN("child2")),
+                Html("<parent><child1/><child2/></parent>"),
                 
                 // Expected results
-                TN("child1"),
-                TN("child2")
+                Html("<child1/>"),
+                Html("<child2/>")
                 );
+                */
 
             testObject.CreateExample(
-                TN("parent",
-                    TN("child1"),
-                    TN("child2",
-                        TN("child3"))),
-                
-                // Expected results
-                TN("child1"),
-                TN("child2", TN("child3")),
-                TN("child3"));
+                Html("<parent><child1/><child2><child3/></child2></parent>"),
 
+                // Expected results
+                Html("<child1/>"),
+                Html("<child2><child3/></child2>"),
+                Html("<child3/>"));
 
 
             testObject.CreateTestCase(
-                TN("parent",
-                        TN("child1",
-                            TN("child3")),
-                        TN("child2")),
+                Html("<parent><child1><child3/></child1><child2/></parent>"),
 
                 // Expected results
-                TN("child1", TN("child3")),
-                TN("child3"),
-                TN("child2"));
+                Html("<child1><child3/></child1>"),
+                Html("<child3/>"),
+                Html("<child2/>")); 
 
             testObject.RunTest();
         }
@@ -132,59 +129,124 @@ namespace TreeManipulation
         public void TestLearnKthChild()
         {
             testObject.CreateExample(
-                TN("parent",
-                    TN("child1"),
-                    TN("child2")),
+                Html("<parent><child1/><childImportant><child3/></childImportant></parent>"),
 
                 // Expected results
-                TN("child2"));
-
-            testObject.CreateExample(
-                TN("parent",
-                    TN("child1"),
-                    TN("child2",
-                        TN("child3"))),
-
-                // Expected results
-                TN("child2", TN("child3")));
+                Html("<childImportant><child3/></childImportant>"));
 
             testObject.CreateTestCase(
-                TN("parent",
-                    TN("child1", 
-                        TN("child3")),
-                    TN("secondChild")),
+                Html("<parent><child1><child3/></child1><secondChild/></parent>"),
 
                 // Expected results
-                TN("secondChild"));
+                Html("<secondChild>"));
 
             testObject.RunTest();
+        }
+        [TestMethod]
+        public void TestLearnKthChildChildren()
+        {
+            testObject.CreateExample(
+                Html("<parent><child1/><child2><this/><that/></child2></parent>"),
+
+                // Expected results
+                Html("<this/>"),
+                Html("<that/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><no/><p><yes1/><yes2/></p></parent>"),
+
+                // Expected results
+                Html("<yes1>"),
+                Html("<yes2>"));
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestLearnRecursiveKthChildren()
+        {
+            testObject.CreateExample(
+                Html("<parent><child1/><child2><this/><that/></child2></parent>"),
+
+                // Expected results
+                Html("<this/>"));
+                //Html("<that/>"));
+
+            testObject.CreateExample(
+                Html("<parent><child1><none1/></child1><child2><special/><that/></child2><none2/></parent>"),
+
+                // Expected results
+                Html("<special/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><no/><p><yes1/><yes2/></p></parent>"),
+
+                // Expected results
+                Html("<yes1>"),
+                Html("<yes2>"));
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestLearnKthChildByTag()
+        {
+            // Failing, expect something like:
+            // Single(SelectChild(MatchNodes(MatchTag(x, "child1"), Descendants(tree)), 0));
+            testObject.CreateExample(
+                Html(@"<parent>
+                        <childNot/>
+                        <child1 id='this one'/>
+                        <child1/>
+                        <child3/>
+                       </parent>"),
+
+                // Expected results
+                Html("<child1 id='this one'/>"));
+
+            testObject.CreateExample(
+                Html(@"<parent>
+                        <nope>
+                            <childNot/>
+                            <child1 class='that one'/>
+                        </nope>
+                        <child1 id='last'/>
+                       </parent>"),
+
+                // Expected results
+                Html("<child1 class='that one'/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><child2/><nope><nope><child1 id='first'/><child1/></nope></nope></parent>"),
+
+                // Expected results
+                Html("<child1 id='first'/>"));
+
+            testObject.RunTest();
+
+
         }
 
         [TestMethod]
         public void TestLearnMatchTag()
         {
             testObject.CreateExample(
-                TN("parent",
-                    TN("special"),
-                    TN("child2")),
+                Html("<parent><special/><child2/></parent>"),
 
-                TN("special"));
+                // Expected results
+                Html("<special/>"));
 
             testObject.CreateExample(
-                TN("parent",
-                    TN("child2",
-                        TN("special"))),
+                Html("<parent><child2><special/></child2></parent>"),
 
-                TN("special"));
+                // Expected results
+                Html("<special/>"));
 
             testObject.CreateTestCase(
-                TN("parent",
-                    TN("child1", 
-                        TN("child3"),
-                        TN("special")),
-                    TN("child2")),
+                Html("<parent><child1><child3/><special/></child1><child2/></parent>"),
 
-                TN("special"));
+                // Expected results
+                Html("<special/>"));
 
             testObject.RunTest();
         }
@@ -193,26 +255,18 @@ namespace TreeManipulation
         public void TestLearnConcat()
         {
             testObject.CreateExample(
-                TN("parent",
-                    TN("special1"),
-                    TN("child2"),
-                    TN("special2")),
+                Html("<parent><special1/><child2/><special2/></parent>"),
 
-                TN("special1"),
-                TN("special2"));
+                // Expected results
+                Html("<special1/>"),
+                Html("<special2/>"));
 
             testObject.CreateTestCase(
-                TN("parent",
-                    TN("child1", 
-                        TN("child3"),
-                        TN("special")),
-                    TN("child2"),
-                    TN("child3")),
+                Html("<parent><child1><child3/><special/></child1><child2/><child4/></parent>"),
 
-                TN("child1", 
-                    TN("child3"),
-                    TN("special")),
-                TN("child3"));
+                // Expected results
+                Html("<child1><child3/><special/></child1>"),
+                Html("<child4/>"));
 
             testObject.RunTest();
         }
@@ -220,41 +274,28 @@ namespace TreeManipulation
         [TestMethod]
         public void TestLearnAttribute()
         {
-            var attrs1 = new Attributes(new Attributes.Attribute("id", "hello"));
-            var attrs2 = new Attributes(new Attributes.Attribute("id", "goodbye"), new Attributes.Attribute("eh", "eh"));
-            var attrs3 = new Attributes(new Attributes.Attribute("wrong", "wrong"));
+            // Searching for nodes with an "id" attribute
             testObject.CreateExample(
-                TN("parent",
-                    TN("special1", attrs3),
-                    TN("child2", attrs1),
-                    TN("special2", attrs2)),
+                Html("<parent><special1 wrong='wrong'/><child2 id='hello'/><special2 id='goodbye' notImportant='eh'/></parent>"),
 
-                TN("child2", attrs1),
-                TN("special2", attrs2));
+                // Expected
+                Html("<child2 id='hello'/>"),
+                Html("<special2 id='goodbye' notImportant='eh'/>"));
 
             testObject.CreateExample(
-                TN("parent",
-                    TN("special1", attrs1),
-                    TN("child2", attrs1),
-                    TN("special2", attrs2)),
+                Html("<parent><special1 id='hello'/><child2 id='hello'/><special2 id='goodbye' notImportant='eh'/></parent>"),
 
-                TN("special1", attrs1),
-                TN("child2", attrs1),
-                TN("special2", attrs2));
+                Html("<special1 id='hello'/>"),
+                Html("<child2 id='hello'/>"),
+                Html("<special2 id='goodbye' notImportant='eh'/>"));
 
             testObject.CreateTestCase(
-                TN("parent",
-                    TN("child1", attrs3, 
-                        TN("child3"),
-                        TN("special", attrs3)),
-                    TN("child2", attrs1),
-                    TN("child3")),
+                Html("<parent><child1 wrong='wrong'><child3/><special wrong='wrong'/></child1><child2 id='hello'/><child4/></parent>"),
 
-                TN("child2", attrs1));
+                Html("<child2 id='hello'/>"));
 
             testObject.RunTest();
         }
-
 
     }
 }

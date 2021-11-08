@@ -14,6 +14,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Microsoft.ProgramSynthesis.Wrangling.Tree;
+using HtmlAgilityPack;
+using System.Xml.Linq;
+using TreeManipulation;
 
 namespace Tests.Utils
 {
@@ -155,6 +159,55 @@ namespace Tests.Utils
         public void CreateTestCase(TIn input, params TOut[] outs)
         {
             base.CreateTestCase(input, outs.ToList());
+        }
+    }
+
+    class HtmlSequenceTestObject: SequenceTestObject<ProseHtmlNode, ProseHtmlNode>
+    {
+        public HtmlSequenceTestObject(string grammar) 
+            : base(grammar) {}
+    }
+
+    class WebscrapeTestObject : SequenceTestObject<ProseHtmlNode, ProseHtmlNode>
+    {
+
+        public WebscrapeTestObject(string grammar)
+            : base(grammar) { }
+
+        public void CreateExample(string url, params string[] outs)
+        {
+            var node = ParseFromURL(url);
+            var outNodes = outs.Select(ParseFromString).ToList();
+            CreateExample(node, outNodes);
+        }
+
+        public void CreateTestCase(string url, params string[] outs)
+        {
+            var node = ParseFromURL(url);
+            var outNodes = outs.Select(ParseFromString).ToList();
+            CreateTestCase(node, outNodes);
+        }
+
+        protected override void AssertTruth(IEnumerable<ProseHtmlNode> expected, object actual)
+        {
+            Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
+        }
+
+        private ProseHtmlNode ParseFromString(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            return ProseHtmlNode.DeserializeFromHtmlNode(doc.DocumentNode.FirstChild);
+        }
+
+        private ProseHtmlNode ParseFromURL(string url)
+        {
+            var web = new HtmlWeb();
+            var doc = web.Load(url);
+            doc.OptionOutputAsXml = true;
+            var root = doc.DocumentNode;
+
+            return ProseHtmlNode.DeserializeFromHtmlNode(root.SelectSingleNode("html"));
         }
     }
 }
