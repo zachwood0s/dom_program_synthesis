@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TreeManipulation
 {
-    public class ProseAttribute
+    public struct ProseAttribute
     {
         private string _name;
         private string _value;
@@ -19,6 +19,7 @@ namespace TreeManipulation
         {
             _name = name;
             _value = value;
+            _cachedHashCode = null;
         }
 
         public static ProseAttribute DeserializeFromHtmlAttribute(HtmlAttribute att)
@@ -75,8 +76,8 @@ namespace TreeManipulation
         public IEnumerable<ProseHtmlNode> Descendants 
             => _childNodes.RecursiveSelect(x => x.ChildNodes);
 
-        public ProseAttribute this[string key]
-            => _attributes.TryGetValue(key, out var val) ? val : null;
+        public ProseAttribute? this[string key]
+            => _attributes.TryGetValue(key, out var val) ? val : (ProseAttribute?) null;
 
         public ProseHtmlNode(string name)
         {
@@ -221,6 +222,37 @@ namespace TreeManipulation
                 }
             }
             Console.WriteLine($"Removed {count} duplicates");
+        }
+
+        public ProseHtmlNode DeepCopy()
+        {
+            var newNode = new ProseHtmlNode(_name)
+            {
+                _attributes = new Dictionary<string, ProseAttribute>(_attributes),
+                _childNodes = _childNodes.Select(x => x.DeepCopy()).ToList(),
+                _type = _type,
+                _text = _text,
+                _line = _line,
+                _col = _col,
+                _parent = null
+            };
+            foreach(var c in newNode.ChildNodes)
+            {
+                c._parent = newNode;
+            }
+            return newNode;
+        }
+
+        public void Traverse(Action<ProseHtmlNode> action)
+        {
+            action(this);
+            _childNodes.ForEach(x => x.Traverse(action));
+        }
+
+        public void RandomlyOrderChildren()
+        {
+            var r = new Random();
+            _childNodes = _childNodes.OrderBy(_ => r.NextDouble()).ToList();
         }
     }
 }

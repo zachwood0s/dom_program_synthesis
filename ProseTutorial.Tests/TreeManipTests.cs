@@ -75,6 +75,7 @@ namespace TreeManipulation
             testObject.CreateExample(
                 Html("<parent><child1/><child2/></parent>"),
 
+                // Expected results
                 Html("<child1/>"),
                 Html("<child2/>")
                 );
@@ -82,6 +83,7 @@ namespace TreeManipulation
             testObject.CreateTestCase(
                 Html("<parent><child1/><child2><child3/></child2></parent>"),
 
+                // Expected results
                 Html("<child1/>"),
                 Html("<child2><child3/></child2>")
                 );
@@ -127,12 +129,6 @@ namespace TreeManipulation
         public void TestLearnKthChild()
         {
             testObject.CreateExample(
-                Html("<parent><child1/><child2/></parent>"),
-
-                // Expected results
-                Html("<child2/>"));
-
-            testObject.CreateExample(
                 Html("<parent><child1/><childImportant><child3/></childImportant></parent>"),
 
                 // Expected results
@@ -155,6 +151,32 @@ namespace TreeManipulation
                 // Expected results
                 Html("<this/>"),
                 Html("<that/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><no/><p><yes1/><yes2/></p></parent>"),
+
+                // Expected results
+                Html("<yes1>"),
+                Html("<yes2>"));
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestLearnRecursiveKthChildren()
+        {
+            testObject.CreateExample(
+                Html("<parent><child1/><child2><this/><that/></child2></parent>"),
+
+                // Expected results
+                Html("<this/>"));
+                //Html("<that/>"));
+
+            testObject.CreateExample(
+                Html("<parent><child1><none1/></child1><child2><special/><that/></child2><none2/></parent>"),
+
+                // Expected results
+                Html("<special/>"));
 
             testObject.CreateTestCase(
                 Html("<parent><no/><p><yes1/><yes2/></p></parent>"),

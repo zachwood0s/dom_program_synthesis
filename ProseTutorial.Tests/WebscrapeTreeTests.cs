@@ -40,15 +40,15 @@ namespace TreeManipulation
                 "https://www.cs.purdue.edu/people/faculty/chjung.html",
 
                 // Expected Output
-                //"<h1>Changhee Jung</h1>");
-                "<h3 style=\"color: #000;\">Associate Professor in Computer Science</h3>");
+                "<h1>Changhee Jung</h1>");
+                //"<h3 style=\"color: #000;\">Associate Professor in Computer Science</h3>");
 
             testObject.CreateExample(
                 "https://www.cs.purdue.edu/people/faculty/bgstm.html",
 
                 // Expected Output
-               // "<h1>Tony Bergstrom</h1>");
-                "<h3 style=\"color: #000;\">Assistant Professor of Practice</h3>");
+                "<h1>Tony Bergstrom</h1>");
+                //"<h3 style=\"color: #000;\">Assistant Professor of Practice</h3>");
 
             testObject.RunTest();
         }
