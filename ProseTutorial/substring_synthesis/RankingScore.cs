@@ -12,45 +12,39 @@ namespace SubstringSynthesis
         }
 
         [FeatureCalculator(nameof(Semantics.Concat))]
-        public static double Concat(double s1, double s2)
+        public static double Concat(double l1, double l2)
         {
-            return s1 * s2;
+            return l1 * l2;
         }
 
-        [FeatureCalculator(nameof(Semantics.SubstringPP))]
-        public static double SubstringPP(double s, double start, double end)
+        [FeatureCalculator(nameof(Semantics.Split))]
+        public static double Split(double v, double c)
         {
-            return start * end;
+            return v * c;
         }
 
-        [FeatureCalculator(nameof(Semantics.SubstringPL))]
-        public static double SubstringPL(double s, double pos, double l)
+        [FeatureCalculator(nameof(Semantics.SelectK))]
+        public static double SelectK(double list, double k)
         {
-            return pos * l;
+            return list * k;
         }
 
-        [FeatureCalculator(nameof(Semantics.Date))]
-        public static double Date(double s)
+        [FeatureCalculator(nameof(Semantics.SelectRegex))]
+        public static double SelectRegex(double list, double r)
         {
-            return s * s;
+            return list * r;
         }
 
-        [FeatureCalculator(nameof(Semantics.AbsPos))]
-        public static double AbsPos(double s, double k)
+        [FeatureCalculator(nameof(Semantics.TakeFirst))]
+        public static double TakeFirst(double list)
         {
-            return k;
+            return list;
         }
 
-        [FeatureCalculator(nameof(Semantics.RelPosLeft))]
-        public static double RelPosLeft(double s, double r)
+        [FeatureCalculator(nameof(Semantics.JoinList))]
+        public static double JoinList(double list, double c)
         {
-            return r;
-        }
-
-        [FeatureCalculator(nameof(Semantics.RelPosRight))]
-        public static double RelPosRight(double s, double r)
-        {
-            return r;
+            return c;
         }
 
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
@@ -59,14 +53,14 @@ namespace SubstringSynthesis
             return 1.0 / Math.Abs(k);
         }
 
-        [FeatureCalculator("l", Method = CalculationMethod.FromLiteral)]
-        public static double L(int l)
+        [FeatureCalculator("c", Method = CalculationMethod.FromLiteral)]
+        public static double C(char c)
         {
-            return 1.0 / Math.Abs(l);
+            return 1;
         }
 
         [FeatureCalculator("r", Method = CalculationMethod.FromLiteral)]
-        public static double R(Regex regex)
+        public static double R(Regex r)
         {
             return 1;
         }

@@ -1,23 +1,66 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace SubstringSynthesis
 {
     public static class Semantics
     {
-        public static string Concat(string s1, string s2)
+        public static IReadOnlyList<string> Split(string s, char c)
         {
-            return s1 + s2;
+            return s.Split(c);
+        }
+        public static IReadOnlyList<string> Concat(IReadOnlyList<string> l1, IReadOnlyList<string> l2)
+        {
+            return l1.Concat(l2).ToList();
         }
 
-        public static string SubstringPP(string v, int start, int end)
+        public static IReadOnlyList<string> SelectK(IReadOnlyList<string> l, int k)
         {
-            return v.Substring(start, end - start);
+            return new List<string>() { l[k] };
         }
 
-        public static string SubstringPL(string v, int pos, int l)
+        public static IReadOnlyList<string> SelectRegex(IReadOnlyList<string> l, Regex r)
         {
-            return v.Substring(pos, l);
+            return l.Where(s => r.Match(s).Success).ToList();
+        }
+
+        public static string TakeFirst(IReadOnlyList<string> l)
+        {
+            return l.First();
+        }
+
+        public static IReadOnlyList<string> JoinList(IReadOnlyList<string> l, char c)
+        {
+            return new List<string>() { string.Join(c, l) };
+        }
+
+
+        // Not used
+        /*public static string[] SubList(string[] l, int start, int end)
+        {
+            return new List<string>(l).GetRange(start, end - start).ToArray();
+        }
+
+        public static string SubstringPP(string s, int start, int end)
+        {
+            return s.Substring(start, end - start);
+        }
+
+        public static string SubstringPL(string s, int pos, int l)
+        {
+            return s.Substring(pos, l);
+        }
+
+        public static int? StrPosLeft(string s, string ss)
+        {
+            return s.IndexOf(ss);
+        }
+
+        public static int? StrPosRight(string s, string ss)
+        {
+            return s.IndexOf(ss) + ss.Length;
         }
 
         public static int? AbsPos(string v, int k)
@@ -63,6 +106,6 @@ namespace SubstringSynthesis
             }
 
             return v;
-        }
+        }*/
     }
 }

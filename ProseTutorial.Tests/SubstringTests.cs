@@ -41,15 +41,57 @@ namespace SubstringSynthesis
 
 
         [TestMethod]
-        public void TestNumbers()
+        public void TestRegex()
         {
-            testObject.CreateExample("After landing at 1270 ", "1270");
-            testObject.CreateExample("1221 asdf", "1221");
+            testObject.CreateExample("1270 adffss", "1270");
+            testObject.CreateExample("asdf 1271 adffss", "1271");
 
-            testObject.CreateTestCase("----123 asdf", "123");
-            testObject.CreateTestCase("1233456asdf", "1233456");
-            testObject.CreateTestCase("123", "123");
-            testObject.CreateTestCase("in 2011. He stood without success f", "2011");
+            testObject.CreateTestCase("as sdq 123", "123");
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestSelectK()
+        {
+            testObject.CreateExample("1270 adffss", "1270");
+            testObject.CreateExample("asdf adffss", "asdf");
+
+            testObject.CreateTestCase("asdf 123", "asdf");
+            testObject.CreateTestCase("as 123", "as");
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestSelectKAndConcat()
+        {
+            testObject.CreateExample("1 1270 a", "1 a");
+            testObject.CreateExample("2 dsfa b", "2 b");
+
+            testObject.CreateTestCase("a 2d c", "a c");
+            testObject.CreateTestCase("b dfa d", "b d");
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestSelectKAndRegex()
+        {
+            testObject.CreateExample("1 aa advs", "1,aa");
+            testObject.CreateExample("adfa bb 2", "2,bb");
+
+            testObject.CreateTestCase("dfa cc advs f 3 a asd s", "3,cc");
+            testObject.CreateTestCase("a dd adf 4", "4,dd");
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestConcatRecursion()
+        {
+            testObject.CreateExample("1 2 3 4", "2-3-1");
+            testObject.CreateExample("a b c d", "b-c-a");
 
             testObject.RunTest();
         }
@@ -57,7 +99,7 @@ namespace SubstringSynthesis
         [TestMethod]
         public void TestDate()
         {
-            testObject.CreateExample("asdf qe 11/01/1111 asdfasdf asde q", "11/01/1111");
+            testObject.CreateExample("asdf qe 11-01-1111 asdfasdf asde q", "11-01-1111");
             testObject.CreateExample(" 11-01-1111 asasdf asde q", "11-01-1111");
 
             testObject.CreateTestCase("ase 11-01-1111 asd", "11-01-1111");
@@ -69,23 +111,10 @@ namespace SubstringSynthesis
         [TestMethod]
         public void TestPhoneNumbers()
         {
-            testObject.CreateExample("asdf qe (231) 231-1234 13411faad 123", "(231) 231-1234");
-            testObject.CreateExample("as (111) 875-5678 ad 123", "(111) 875-5678");
+            testObject.CreateExample("asdf qe (231) 231-1234 adf asdf", "(231) 231-1234");
+            testObject.CreateExample("as (111) 875-5678 ad fdasd", "(111) 875-5678");
 
-            testObject.CreateTestCase("asdf dvasae fdasdf 1222-01-11 (221) 231-1234 asde q", "(221) 231-1234");
-
-            testObject.RunTest();
-        }
-
-        [TestMethod]
-        public void TestConcat()
-        {
-            //testObject.CreateExample("1----a", "1a");
-            //testObject.CreateExample("1-------b", "1b");
-            testObject.CreateExample("12---ab", "12ab");
-            //testObject.CreateExample("123---abc", "123abc");
-
-            //testObject.CreateTestCase("12", "321");
+            testObject.CreateTestCase("asdf dvasae fdasdf (221) 231-1234 asde q", "(221) 231-1234");
 
             testObject.RunTest();
         }

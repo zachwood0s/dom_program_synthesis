@@ -6,24 +6,355 @@ using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Rules;
 using Microsoft.ProgramSynthesis.Specifications;
+using Microsoft.ProgramSynthesis.Utils;
 
 namespace SubstringSynthesis
 {
     public class WitnessFunctions : DomainLearningLogic
     {
-        private static string[] regexParts =
-        {
-            @"[a-zA-Z]+", @"\d+", @"\s+", @"$", @"[a-zA-Z]", @"\d", @"\s",
-            @"\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}" // Phone number
-        };
-
         public WitnessFunctions(Grammar grammar) : base(grammar)
         {
         }
 
-        #region Concat Witness Functions
+        private static Regex[] regexes =
+        {
+            new Regex(@"[a-zA-Z]+"),
+            new Regex(@"\d+"),
+            new Regex(@"\s+"),
+            new Regex(@"(\n|\r|\r\n)"),
+            new Regex(@"\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}") // Phone number
+        };
+
+        #region Split
+
+        //[WitnessFunction(nameof(Semantics.Split), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessSplitStr(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec charSpec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var input = inputState[Grammar.InputSymbol] as string;
+                var strs = new HashSet<string>();
+
+                char c = (char)charSpec.Examples[inputState];
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    if (output.Count > 1)
+                    {
+                        string i = string.Join((char)c, output);
+                        strs.Add(i);
+                    }
+                }
+
+                if (strs.Count == 0) return null;
+                result[inputState] = strs.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.Split), 1)]
+        public DisjunctiveExamplesSpec WitnessSplitC(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var input = inputState[Grammar.InputSymbol] as string;
+                var chars = new HashSet<char>();
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    List<char> outputC = string.Join("", output).Distinct().ToList();
+                    List<char> strC = input.Distinct().ToList();
+
+                    if (outputC.Count() != strC.Count() - 1) continue;
+
+                    List<char> diff = strC.Except(outputC).ToList();
+
+                    if (diff.Count() != 1) continue;
+
+                    chars.Add(diff.First());
+                }
+
+                if (chars.Count == 0) return null;
+                result[inputState] = chars.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        #endregion
+
+        #region JoinList
+
+        [WitnessFunction(nameof(Semantics.JoinList), 1)]
+        public DisjunctiveExamplesSpec WitnessJoinListC(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var chars = new HashSet<char>();
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    if (output.Count != 1) continue;
+
+                    List<char> newChars = output.First().Distinct().ToList();
+                    chars = chars.Concat(newChars).ToHashSet();
+                }
+
+                if (chars.Count == 0) return null;
+                result[inputState] = chars.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.JoinList), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessJoinListL(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec charSpec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var lists = new List<IReadOnlyList<string>>();
+
+                char c = (char) charSpec.Examples[inputState];
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    if (output.Count != 1) continue;
+
+                    if (output.First().Contains(c))
+                        lists.Add(output.First().Split(c));
+                }
+
+                if (lists.Count == 0) return null;
+                result[inputState] = lists.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        #endregion
+
+        #region Concat
 
         [WitnessFunction(nameof(Semantics.Concat), 0)]
+        public DisjunctiveExamplesSpec WitnessConcat1(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var lists = new HashSet<IReadOnlyList<string>>();
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    for (int i = 1; i < output.Count; i++) lists.Add(HelperMethods.SubArray(output.ToList(), 0, i));
+                }
+
+                if (lists.Count == 0) return null;
+                result[inputState] = lists.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.Concat), 1, DependsOnParameters = new[] { 0 })]
+        public DisjunctiveExamplesSpec WitnessConcat2(GrammarRule rule, DisjunctiveExamplesSpec spec, DisjunctiveExamplesSpec list1Spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var lists = new HashSet<IReadOnlyList<string>>();
+
+                foreach (IReadOnlyList<string> l1 in list1Spec.DisjunctiveExamples[inputState])
+                {
+                    foreach (IReadOnlyList<string> output in example.Value)
+                    {
+                        if (output.Count > l1.Count)
+                            lists.Add(HelperMethods.SubArray(output.ToList(), l1.Count, output.Count - l1.Count));
+                    }
+                }
+
+                if (lists.Count == 0) return null;
+                result[inputState] = lists.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        #endregion
+
+        #region SelectK
+
+        [WitnessFunction(nameof(Semantics.SelectK), 1)]
+        public DisjunctiveExamplesSpec WitnessSelectKK(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var input = inputState[Grammar.InputSymbol] as string;
+                var k = new HashSet<int>();
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    if (output.Count != 1) continue;
+
+                    char? c = HelperMethods.getSplitChar(input, output);
+
+                    if (c == null) continue;
+
+                    List<string> lists = input.Split((char)c).ToList();
+
+                    k.Add(lists.IndexOf(output.First()));
+                }
+
+                if (k.Count == 0) return null;
+                result[inputState] = k.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.SelectK), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessSelectKList(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec kSpec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var input = inputState[Grammar.InputSymbol] as string;
+                var lists = new HashSet<IReadOnlyList<string>>();
+
+                int k = (int) kSpec.Examples[inputState];
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    if (output.Count != 1) continue;
+
+                    char? c = HelperMethods.getSplitChar(input, output);
+
+                    if (c == null) continue;
+
+                    IReadOnlyList<string> l = input.Split((char) c);
+
+                    if (k == l.IndexOf(output.First())) lists.Add(l);
+                }
+
+                if (lists.Count == 0) return null;
+                result[inputState] = lists.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        #endregion
+
+        #region SelectRegex
+
+        [WitnessFunction(nameof(Semantics.SelectRegex), 1)]
+        public DisjunctiveExamplesSpec WitnessSelectRegexR(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var regexes = new HashSet<Regex>();
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    regexes = regexes.Concat(HelperMethods.getMatches(output)).ToHashSet();
+                }
+
+                if (regexes.Count == 0) return null;
+                result[inputState] = regexes.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.SelectRegex), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessSelectRegexList(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec regexSpec)
+        {
+      
+            var result = new Dictionary<State, IEnumerable<object>>();
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var input = inputState[Grammar.InputSymbol] as string;
+                var lists = new HashSet<IReadOnlyList<string>>();
+
+                Regex r = (Regex)regexSpec.Examples[inputState];
+
+                foreach (IReadOnlyList<string> output in example.Value)
+                {
+                    if (output.Count < 1) continue;
+
+                    char? c = HelperMethods.getSplitChar(input, output);
+
+                    if (c == null) continue;
+
+                    IReadOnlyList<string> list = input.Split((char)c);
+                    IReadOnlyList<string> newList = list.Where(l => r.Match(l).Success).ToList();
+
+                    if (newList.SequenceEqual(output)) lists.Add(list);
+                }
+
+                if (lists.Count == 0) return null;
+                result[inputState] = lists.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        #endregion
+
+        #region TakeFirst
+
+        [WitnessFunction(nameof(Semantics.TakeFirst), 0)]
+        public DisjunctiveExamplesSpec WitnessTakeFirst(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var lists = new List<IReadOnlyList<string>>();
+
+                foreach (string output in example.Value)
+                {
+                    lists.Add(new List<string>() { output });
+                }
+
+                if (lists.Count == 0) return null;
+                result[inputState] = lists.Cast<object>();
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        #endregion
+
+        /* #region Concat Witness Functions
+
+        //[WitnessFunction(nameof(Semantics.Concat), 0)]
         public DisjunctiveExamplesSpec WitnessS1(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
@@ -45,7 +376,7 @@ namespace SubstringSynthesis
             return DisjunctiveExamplesSpec.From(result);
         }
 
-        [WitnessFunction(nameof(Semantics.Concat), 1, DependsOnParameters = new[] { 0 })]
+        //[WitnessFunction(nameof(Semantics.Concat), 1, DependsOnParameters = new[] { 0 })]
         public DisjunctiveExamplesSpec WitnessS2(GrammarRule rule, DisjunctiveExamplesSpec spec, DisjunctiveExamplesSpec s1Spec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
@@ -54,10 +385,10 @@ namespace SubstringSynthesis
             {
                 State inputState = example.Key;
                 var outputs = new HashSet<string>();
-     
-                foreach(string s1 in s1Spec.DisjunctiveExamples[inputState])
+
+                foreach (string s1 in s1Spec.DisjunctiveExamples[inputState])
                 {
-                    foreach(string output in example.Value) 
+                    foreach (string output in example.Value)
                         if (output.Length > s1.Length && output.IndexOf(s1) == 0)
                             outputs.Add(output.Substring(s1.Length, output.Length - s1.Length));
                 }
@@ -82,7 +413,7 @@ namespace SubstringSynthesis
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
             {
                 State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as string;
+                var input = inputState[Grammar.InputSymbol] as string;
                 var occurrences = new HashSet<int>();
 
                 foreach (string output in example.Value)
@@ -105,14 +436,13 @@ namespace SubstringSynthesis
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
             {
                 State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as string;
+                var input = inputState[Grammar.InputSymbol] as string;
                 var occurrences = new HashSet<int>();
 
                 foreach (int start in startSpec.DisjunctiveExamples[inputState])
                 {
                     foreach (string output in example.Value)
-                        if (input.IndexOf(output) == start)
-                            occurrences.Add(start + output.Length);
+                        if (input.IndexOf(output) == start) occurrences.Add(start + output.Length);
                 }
 
                 if (occurrences.Count == 0) return null;
@@ -171,6 +501,37 @@ namespace SubstringSynthesis
             return DisjunctiveExamplesSpec.From(result);
         }
 
+        [WitnessFunction(nameof(Semantics.StrPosLeft), 1)]
+        [WitnessFunction(nameof(Semantics.StrPosRight), 1)]
+        public DisjunctiveExamplesSpec WitnessSS(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var input = inputState[rule.Body[0]] as string;
+                var strs = new List<string>();
+
+                foreach (int output in example.Value)
+                {
+                    if (rule.Id == "StrPosLeft")
+                    {
+                        strs = getStrings(input, output).ToList();
+                    }
+                    else
+                    {
+                        strs = getStrings(input, output, left: false).ToList();
+                    }
+                }
+
+                if (strs.Count == 0) return null;
+                result[inputState] = strs;
+            }
+
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
         [WitnessFunction(nameof(Semantics.RelPosLeft), 1)]
         [WitnessFunction(nameof(Semantics.RelPosRight), 1)]
         public DisjunctiveExamplesSpec WitnessR(GrammarRule rule, DisjunctiveExamplesSpec spec)
@@ -181,27 +542,17 @@ namespace SubstringSynthesis
             {
                 State inputState = example.Key;
                 var input = inputState[rule.Body[0]] as string;
-                var ids = new List<string>();
                 var regexes = new List<Regex>();
 
                 foreach (int output in example.Value)
                 {
-                    /*if (rule.Id == "RelPosLeft")
-                    {
-                        for (int i = input.Length - output; i > 0; i--) ids.Add("[" + input.Substring(output, i) + "]");
-                    }
-                    else
-                    {
-                        for (int i = 0; i < output; i++) ids.Add("[" + input.Substring(i, output - i) + "]");
-                    }*/
-
                     if (rule.Id == "RelPosLeft")
                     {
-                        regexes = getMatches(input, output, ids).ToList();
+                        regexes = getMatches(input, output).ToList();
                     }
                     else
                     {
-                        regexes = getMatches(input, output, ids, len: 1).ToList();
+                        regexes = getMatches(input, output, len: 1).ToList();
                     }
                 }
 
@@ -212,83 +563,120 @@ namespace SubstringSynthesis
             return DisjunctiveExamplesSpec.From(result);
         }
 
-        #endregion
-
-        public DisjunctiveExamplesSpec WitnessID(GrammarRule rule, DisjunctiveExamplesSpec spec)
-        {
-            var result = new Dictionary<State, IEnumerable<object>>();
-
-            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
-            {
-                State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as string;
-                var ids = new List<string>();
-
-                foreach (int output in example.Value)
-                {
-                    if (rule.Id == "RelPosLeft")
-                    {
-                        for (int i = input.Length - output; i > 0; i--) ids.Add(input.Substring(output, i));
-                    }
-                    else
-                    {
-                        for (int i = 0; i < output; i++) ids.Add(input.Substring(i, output - i));
-                    }
-                }
-
-                if (ids.Count == 0) return null;
-                result[inputState] = ids;
-            }
-
-            return DisjunctiveExamplesSpec.From(result);
-        }
+        #endregion */
 
         #region Helper Methods
 
-        private static IEnumerable<Regex> getMatches(string input, int output, List<string> ids, int len = 0)
+        public static class HelperMethods
         {
-            Queue<string> validRegexes = new Queue<string>(regexParts.Concat(ids));
-            bool isSuccess = false;
-            int currentLevel = validRegexes.Count, nextLevel = 0, depth = 0;
-            while (validRegexes.Count > 0)
+            public static List<string> SubArray(List<string> array, int offset, int length)
             {
-                string validRegex = validRegexes.Dequeue();
-                List<string> nextRegexes = new List<string>();
-                foreach (string regexPart in regexParts)
-                {
-                    string nextRegexString = validRegex + regexPart;
-                    if (isValidRegex(nextRegexString))
-                    {
-                        Regex nextRegex = new Regex(nextRegexString);
-                        MatchCollection mc = nextRegex.Matches(input);
+                string[] result = new string[length];
+                Array.Copy(array.ToArray(), offset, result, 0, length);
+                return result.ToList();
+            }
 
-                        if (mc.Count == 1 && mc.First().Index + mc.First().Length * len == output)
+            public static List<Regex> getMatches(IReadOnlyList<string> output)
+            {
+                var result = new List<Regex>();
+
+                foreach (Regex r in regexes)
+                {
+                    bool isMatch = true;
+                    foreach (string o in output)
+                    {
+                        Match m = r.Match(o);
+                        if (!m.Success)
                         {
-                            isSuccess = true;
-                            yield return nextRegex;
-                        } 
-                        else if (mc.Count > 1)
-                        {
-                            nextRegexes.Add(nextRegexString);
+                            isMatch = false;
+                            break;
                         }
+                    }
+
+                    if (isMatch) result.Add(r);
+                }
+
+                return result;
+            }
+
+            public static char? getSplitChar(string input, IReadOnlyList<string> output)
+            {
+                int longest = 0;
+                int index = 0;
+                for(int i = 0; i < output.Count(); i++)
+                {
+                    if (output[i].Length > longest)
+                    {
+                        longest = output[i].Length;
+                        index = i;
                     }
                 }
 
-                if (!isSuccess)
+                int start = input.IndexOf(output[index]);
+                char? c = null;
+
+                if (start - 1 > 0)
                 {
-                    foreach (string s in nextRegexes) validRegexes.Enqueue(s);
-                    nextLevel += nextRegexes.Count;
+                    c = input[start - 1];
+                }
+                else if (start + output.First().Count() < input.Length)
+                {
+                    c = input[start + output.First().Count()];
                 }
 
-                currentLevel--;
-                if (currentLevel == 0)
+                if (c == null) return null;
+                if (string.Join("", output).Contains((char) c)) return null;
+    
+                return c;
+            }
+        }
+
+        /*private static IEnumerable<string> getStrings(string input, int output, bool left = true)
+        {
+            if (left)
+            {
+                for (int i = 1; i < input.Length - output; i++)
                 {
-                    currentLevel = nextLevel;
-                    nextLevel = 0;
-                    if (++depth == 5) 
-                        yield break;
+                    yield return input.Substring(output, i);
                 }
             }
+            else
+            {
+                for (int i = output - 1; i >= 0; i--)
+                {
+                    yield return input.Substring(i, output - i);
+                }
+            }
+        }
+
+        private static IEnumerable<Regex> getMatches(string input, int output, int len = 0)
+        {
+            List<Regex> chars = getChars();
+            foreach(Regex r in regexes.Concat(chars))
+            {
+                Match m = r.Match(input);
+                if (m.Index + m.Length*len == output)
+                {
+                    yield return r;
+                }
+            }
+        }
+        
+        private static List<Regex> getChars()
+        {
+            List<Regex> chars = new List<Regex>();
+            for (int i = 0; i < 127; i++)
+            {
+                char c = Convert.ToChar(i);
+                if (!char.IsControl(c))
+                {
+                    string r = @"[\" + c.ToString() + "]";
+                    if (isValidRegex(r))
+                        chars.Add(new Regex(r));
+                }
+            }
+
+            return chars;
         }
 
         private static bool isValidRegex(string r)
@@ -305,7 +693,7 @@ namespace SubstringSynthesis
             }
 
             return true;
-        }
+        } */
 
         #endregion
     }

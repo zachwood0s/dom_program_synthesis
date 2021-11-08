@@ -5,16 +5,21 @@ language Substring;
 
 @complete feature double Score = SubstringSynthesis.RankingScore;
 
-@input string s;
+@input string v;
 
-@start string program := cat;
+@start string program := str
 
-string cat := substring
+string str := TakeFirst(oneList) | v
 
-string substring := SubstringPP(s, pos, pos) | SubstringPL(s, pos, l)
+IReadOnlyList<string> oneList := JoinList(concat, c) | select
 
-int pos := AbsPos(s, k) | RelPosLeft(s, r) | RelPosRight(s, r)
+IReadOnlyList<string> concat := Concat(concat, select) | select
+
+IReadOnlyList<string> select := SelectK(split, k) 
+							  | SelectRegex(split, r)
+
+IReadOnlyList<string> split := Split(v, c)
 
 int k;
-int l;
+char c;
 Regex r;
