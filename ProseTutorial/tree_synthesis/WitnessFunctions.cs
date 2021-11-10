@@ -200,19 +200,6 @@ namespace TreeManipulation
                                         .ToHashSet()
             );
 
-        [WitnessFunction(nameof(Semantics.MatchTag), 0, DependsOnParameters = new[] { 1 })]
-        public DisjunctiveExamplesSpec WitnessMatchTag1(GrammarRule rule, ExampleSpec spec, DisjunctiveExamplesSpec startSpec)
-        {
-            var result = new Dictionary<State, IEnumerable<object>>();
-            foreach (KeyValuePair<State, object> example in spec.Examples)
-            {
-                State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as ProseHtmlNode;
-                var output = (bool) example.Value;
-
-            }
-            return new DisjunctiveExamplesSpec(result);
-        }
 
         [WitnessFunction(nameof(Semantics.MatchTag), 1)]
         public DisjunctiveExamplesSpec WitnessMatchTag2(GrammarRule rule, ExampleSpec spec)

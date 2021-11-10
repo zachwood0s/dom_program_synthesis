@@ -30,8 +30,8 @@ namespace RelationalProperties
     public class RelationalApplicationStrategy : ApplicationStrategy
     {
         private Dictionary<RelationalPropertyAttribute, IRelationalProperty> _properties;
-        public int TimeoutMillilseconds { get; set; } = 10000;
-        public RelationalApplicationStrategy()
+        public int TimeoutMillilseconds { get; set; } = 60 * 1000; // 1 minute is default max time
+        public RelationalApplicationStrategy(string grammar) : base(grammar)
         {
             _properties = new Dictionary<RelationalPropertyAttribute, IRelationalProperty>();
         }
@@ -95,7 +95,7 @@ namespace RelationalProperties
                     // 5. Create a new set R_new for each R from R_app that is not in R_oldsat
                     var rNewSet = rApp.Where(x => !oldSat.Contains(x)).ToHashSet();
 
-                    foreach( var rNew in rNewSet)
+                    foreach(var rNew in rNewSet)
                     {
                         // 6. Skip if there's a conflict in the conflict mapping between R_new and any R in R_oldsat
                         var pairings = oldSat.Select(x => Tuple.Create(x, rNew));

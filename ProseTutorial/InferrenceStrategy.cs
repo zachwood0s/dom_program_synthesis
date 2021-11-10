@@ -4,6 +4,7 @@ using Microsoft.ProgramSynthesis.Compiler;
 using Microsoft.ProgramSynthesis.Diagnostics;
 using Microsoft.ProgramSynthesis.Features;
 using Microsoft.ProgramSynthesis.Learning;
+using Microsoft.ProgramSynthesis.Learning.Logging;
 using Microsoft.ProgramSynthesis.Learning.Strategies;
 using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.VersionSpace;
@@ -26,6 +27,14 @@ namespace RelationalProperties
         protected Grammar _grammar;
         protected SynthesisEngine _prose;
         protected IFeature _score;
+        protected LogListener _log;
+
+        public Grammar Grammar => _grammar;
+
+        public ApplicationStrategy(string grammar)
+        {
+            _GrammarPath = grammar;
+        }
 
         public void Init(Func<Grammar, IFeature> scoreGen, Func<Grammar, DomainLearningLogic> witnessCreator, params Assembly[] assemblies)
         {
@@ -41,6 +50,12 @@ namespace RelationalProperties
             SynthesisEngine prose = ConfigureSynthesis(_grammar, witnessCreator);
             _prose = prose;
         }
+
+        public void Clear()
+        {
+            _prose.ClearLearningCache();            
+        }
+
         private Result<Grammar> CompileGrammar(params Assembly[] assemblies)
         {
             return DSLCompiler.Compile(new CompilerOptions
@@ -51,19 +66,31 @@ namespace RelationalProperties
         }
         private SynthesisEngine ConfigureSynthesis(Grammar grammar, Func<Grammar, DomainLearningLogic> creator)
         {
+            _log = new LogListener();
             var witnessFunctions = creator(grammar);
             var deductiveSynthesis = new DeductiveSynthesis(witnessFunctions);
             var synthesisExtrategies = new ISynthesisStrategy[] { deductiveSynthesis };
-            var synthesisConfig = new SynthesisEngine.Config { Strategies = synthesisExtrategies };
+            var synthesisConfig = new SynthesisEngine.Config { 
+                Strategies = synthesisExtrategies,
+                LogListener = _log
+            };
             var prose = new SynthesisEngine(grammar, synthesisConfig);
             return prose;
+        }
+
+        public virtual ProgramSet GetProgramSet(IEnumerable<Tuple<object, object>> examples, CancellationToken ct = default)
+        {
+            return GetProgramSet(examples, new HashSet<IRelationalProperty>(), ct);
         }
 
         public virtual ProgramSet GetProgramSet(IEnumerable<Tuple<object, object>> examples, HashSet<IRelationalProperty> properties, CancellationToken ct = default)
         {
             var pExamples = PerturbExamples(examples, properties);
             var spec = GetExampleSpec(pExamples);
-            return _prose.LearnGrammarTopK(spec, _score, k: 1, cancel: ct);
+            var res = _prose.LearnGrammarTopK(spec, _score, k: 1, cancel: ct);
+
+            _log.SaveLogToXML("synthesis_log.xml");
+            return res;
         }
 
         public virtual ProgramSet GetProgramSetTimed(IEnumerable<Tuple<object, object>> examples, HashSet<IRelationalProperty> properties, int millisecondTimeBound)
@@ -101,6 +128,7 @@ namespace RelationalProperties
             var outSet = new HashSet<Tuple<object, object>>();
             foreach (var (input, output) in examples)
             {
+                outSet.Add(Tuple.Create(input, output));
                 foreach(var prop in properties)
                 {
                     outSet.UnionWith(prop.ApplyProperty(input, output).ToHashSet());

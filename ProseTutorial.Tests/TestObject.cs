@@ -18,6 +18,7 @@ using Microsoft.ProgramSynthesis.Wrangling.Tree;
 using HtmlAgilityPack;
 using System.Xml.Linq;
 using TreeManipulation;
+using RelationalProperties;
 
 namespace Tests.Utils
 {
@@ -33,11 +34,14 @@ namespace Tests.Utils
         private SynthesisEngine _prose;
         private IFeature _score;
 
+        private ApplicationStrategy _strategy;
+
         public TestObject(string grammar)
         {
             Examples = new List<Tuple<TIn, TOut>>();
             TestCases = new List<Tuple<TIn, TOut>>();
             _GrammarPath = grammar;
+            _strategy = new ApplicationStrategy(grammar);
         }
 
 
@@ -55,11 +59,13 @@ namespace Tests.Utils
         {
             Examples.Clear();
             TestCases.Clear();
-            _prose.ClearLearningCache();
+            _strategy.Clear();
+            //_prose.ClearLearningCache();
         }
 
         public void Init(Func<Grammar, IFeature> scoreGen, Func<Grammar, DomainLearningLogic> witnessCreator, params Assembly[] assemblies)
         {
+            /*
             Result<Grammar> grammar = compileGrammar(assemblies);
 
             if (grammar.HasErrors)
@@ -71,13 +77,19 @@ namespace Tests.Utils
 
             SynthesisEngine prose = configureSynthesis(_grammar, witnessCreator);
             _prose = prose;
+            */
+            _strategy.Init(scoreGen, witnessCreator, assemblies);
         }
 
         public void RunTest()
         {
+            var casted = Examples.Select(x => new Tuple<object, object>(x.Item1, x.Item2));
+            var learnedSet = _strategy.GetProgramSet(casted);
+            /*
             var spec = getExampleSpec(_grammar);
 
             ProgramSet learnedSet = _prose.LearnGrammarTopK(spec, _score, k: 1);
+            */
             IEnumerable<ProgramNode> programs = learnedSet.RealizedPrograms;
 
             if (programs.Count() == 0)
@@ -87,12 +99,12 @@ namespace Tests.Utils
 
             foreach(var example in Examples)
             {
-                runRealizedProgramWith(programs.First(), _grammar, example.Item1, example.Item2);
+                runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
             }
 
             foreach (var example in TestCases)
             {
-                runRealizedProgramWith(programs.First(), _grammar, example.Item1, example.Item2);
+                runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
             }
         }
 
