@@ -5,13 +5,15 @@ using learners TreeManipulation.WitnessFunctions;
 
 language TreeManim;
 
-@complete feature double Score = TreeManipulation.RankingScore;
+@complete feature double Score = TreeManipulation.RankingScore,
+								 TreeManipulation.LikelihoodScore,
+								 TreeManipulation.ReadabilityScore;
 
 @input ProseHtmlNode tree;
 
 @start IReadOnlyList<ProseHtmlNode> program := rule;
 
-IReadOnlyList<ProseHtmlNode> rule :=
+IReadOnlyList<ProseHtmlNode> rule
 	:= Concat(rule, rule)
 	 | MatchNodes(match, nodes) = Filter(\x: ProseHtmlNode => match, nodes)
 	 | nodes

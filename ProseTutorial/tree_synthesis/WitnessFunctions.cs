@@ -138,6 +138,33 @@ namespace TreeManipulation
             return new DisjunctiveExamplesSpec(result);
         }
 
+        [WitnessFunction(nameof(Semantics.Children), 0)]
+        public DisjunctiveExamplesSpec WitnessChildrenSubseq(GrammarRule rule, DisjunctiveSubsequenceSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<IEnumerable<object>>> example in spec.Examples)
+            {
+                State inputState = example.Key;
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
+
+                var possibilities = new List<ProseHtmlNode>();
+                foreach(IEnumerable<object> outputList in example.Value)
+                {
+                    var occurrences = input.OfType<ProseHtmlNode>()
+                                           .RecursiveSelect(x => x.ChildNodes)
+                                           .Where(x => outputList.All(x.ChildNodes.Contains))
+                                           .ToList();
+                    possibilities.AddRange(occurrences);
+                }
+                
+                if (possibilities.Count == 0) 
+                    return null;
+                result[inputState] = possibilities.Distinct().ToList();
+            }
+            return new DisjunctiveExamplesSpec(result);
+        }
+
         [WitnessFunction(nameof(Semantics.Descendants), 0)]
         public DisjunctiveExamplesSpec WitnessDescendants(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
@@ -227,6 +254,37 @@ namespace TreeManipulation
                     result[inputState] = labels.Where(x => x != input.Name).ToHashSet();
                 }
             }
+            return new DisjunctiveExamplesSpec(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.MatchTag), 1)]
+        public DisjunctiveExamplesSpec WitnessMatchTag2Disjunct(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+            /*
+            foreach (KeyValuePair<State, object> example in spec.Examples)
+            {
+                State inputState = example.Key;
+                var input = inputState[rule.Body[0]] as ProseHtmlNode;
+                var output = (bool) example.Value;
+
+                // Find all of the possible labels in the given input tree
+                var labels = allLabels.GetValue(inputState[Grammar.InputSymbol] as ProseHtmlNode);
+
+                if (output)
+                {
+                    // If this node is supposed to be included in the output, 
+                    // then the only possible label is the node's
+                    result[inputState] = new[] { input.Name };
+                }
+                else
+                {
+                    // If this node is not supposed to be included in the output,
+                    // then the possible labels include every label except the node's
+                    result[inputState] = labels.Where(x => x != input.Name).ToHashSet();
+                }
+            }
+            */
             return new DisjunctiveExamplesSpec(result);
         }
 

@@ -129,7 +129,7 @@ namespace TreeManipulation
         public void TestLearnKthChild()
         {
             testObject.CreateExample(
-                Html("<parent><child1/><childImportant><child3/></childImportant></parent>"),
+                Html("<parent><child1/><childImportant><child3/></childImportant><childImportant id=\"hi\"/></parent>"),
 
                 // Expected results
                 Html("<childImportant><child3/></childImportant>"));
@@ -179,11 +179,10 @@ namespace TreeManipulation
                 Html("<special/>"));
 
             testObject.CreateTestCase(
-                Html("<parent><no/><p><yes1/><yes2/></p></parent>"),
+                Html("<parent><no/><p><yes1/><notThis/></p></parent>"),
 
                 // Expected results
-                Html("<yes1>"),
-                Html("<yes2>"));
+                Html("<yes1>"));
 
             testObject.RunTest();
         }

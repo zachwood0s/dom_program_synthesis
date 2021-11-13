@@ -35,7 +35,7 @@ namespace ProseTutorial
 
             var testObject = new WebscrapeTestObject(@"tree_synthesis/grammar/treemanim.grammar");
             testObject.Init(
-                g => new TreeManipulation.RankingScore(g),
+                g => new TreeManipulation.LikelihoodScore(g),
                 g => new TreeManipulation.WitnessFunctions(g),
                 typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly
                 );
