@@ -8,7 +8,7 @@ using Microsoft.ProgramSynthesis.Rules;
 using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.Utils;
 
-namespace SubstringSynthesis
+namespace WebSynthesis.Substring
 {
     public class WitnessFunctions : DomainLearningLogic
     {

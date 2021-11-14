@@ -13,7 +13,7 @@ using Microsoft.ProgramSynthesis.VersionSpace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.Utils;
 
-namespace SubstringSynthesis
+namespace WebSynthesis.Substring
 {
     [TestClass]
     public class SubstringTests

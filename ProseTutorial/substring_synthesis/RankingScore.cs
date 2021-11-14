@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.Features;
 
-namespace SubstringSynthesis
+namespace WebSynthesis.Substring
 {
     public class RankingScore : Feature<double>
     {

@@ -1,0 +1,23 @@
+﻿using Microsoft.ProgramSynthesis.DslLibrary;
+using Microsoft.ProgramSynthesis.Utils;
+using Microsoft.ProgramSynthesis.Grammar;
+using TreeManipulation;
+
+using semantics WebSynthesis.Joined.Semantics;
+using learners WebSynthesis.Joined.WitnessFunctions;
+using grammar Substring=WebSynthesis.Substring.Language.Grammar;
+using grammar Tree=WebSynthesis.TreeManipulation.Language.Grammar;
+
+language JoinedSynthesis;
+
+@complete feature double Score = JoinedSynthesis.RankingScore;
+
+@input ProseHtmlNode inTree;
+
+@start IReadOnlyList<string> program := strs
+
+IReadOnlyList<string> strs := JoinMap(substring, nodeStrs) = Map(\str: string => substring, nodeStrs);
+string substring := @id['Selection'] @subst[v := str] Substring.program;
+
+IReadOnlyList<string> nodeStrs := NodesToStrs(nodes)
+IReadOnlyList<ProseHtmlNode> nodes := @id['Selection'] @subst[tree := inTree] Tree.program;

@@ -1,13 +1,13 @@
-﻿using TreeManipulation;
+﻿using WebSynthesis.TreeManipulation;
 
-using semantics TreeManipulation.Semantics;
-using learners TreeManipulation.WitnessFunctions;
+using semantics WebSynthesis.TreeManipulation.Semantics;
+using learners WebSynthesis.TreeManipulation.WitnessFunctions;
 
-language TreeManim;
+language WebSynthesis.TreeManipulation;
 
-@complete feature double Score = TreeManipulation.RankingScore,
-								 TreeManipulation.LikelihoodScore,
-								 TreeManipulation.ReadabilityScore;
+@complete feature double Score = WebSynthesis.TreeManipulation.RankingScore,
+								 WebSynthesis.TreeManipulation.LikelihoodScore,
+								 WebSynthesis.TreeManipulation.ReadabilityScore;
 
 @input ProseHtmlNode tree;
 

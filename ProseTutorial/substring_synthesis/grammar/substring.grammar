@@ -1,9 +1,12 @@
-﻿using semantics SubstringSynthesis.Semantics;
-using learners SubstringSynthesis.WitnessFunctions;
+﻿using Microsoft.ProgramSynthesis.DslLibrary;
+using Microsoft.ProgramSynthesis.Utils;
 
-language Substring;
+using semantics WebSynthesis.Substring.Semantics;
+using learners WebSynthesis.Substring.WitnessFunctions;
 
-@complete feature double Score = SubstringSynthesis.RankingScore;
+language WebSynthesis.Substring;
+
+@complete feature double Score = WebSynthesis.Substring.RankingScore;
 
 @input string v;
 

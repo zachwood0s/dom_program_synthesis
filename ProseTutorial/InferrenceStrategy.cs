@@ -16,7 +16,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
-namespace RelationalProperties
+namespace WebSynthesis.RelationalProperties
 {
     /// <summary>
     /// This will handle the actual compilation 

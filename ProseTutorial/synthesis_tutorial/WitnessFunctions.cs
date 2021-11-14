@@ -7,7 +7,7 @@ using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Rules;
 using Microsoft.ProgramSynthesis.Specifications;
 
-namespace ProseTutorial
+namespace WebSynthesis
 {
     public class WitnessFunctions : DomainLearningLogic
     {

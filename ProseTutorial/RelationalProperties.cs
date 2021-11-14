@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RelationalProperties
+namespace WebSynthesis.RelationalProperties
 {
     public interface IRelationalProperty
     {

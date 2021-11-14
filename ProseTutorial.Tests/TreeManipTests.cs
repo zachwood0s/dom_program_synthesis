@@ -17,7 +17,7 @@ using Microsoft.ProgramSynthesis.Wrangling.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.Utils;
 
-namespace TreeManipulation
+namespace WebSynthesis.TreeManipulation
 {
     [TestClass]
     public class TreeManipTest

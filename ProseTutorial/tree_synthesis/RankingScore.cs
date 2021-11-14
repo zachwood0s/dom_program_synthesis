@@ -6,7 +6,7 @@ using Microsoft.ProgramSynthesis.Wrangling.Tree;
 using Microsoft.ProgramSynthesis.Rules.Concepts;
 using Microsoft.ProgramSynthesis.AST;
 
-namespace TreeManipulation
+namespace WebSynthesis.TreeManipulation
 {
     public class RankingScore : Feature<double>
     {

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace SubstringSynthesis
+namespace WebSynthesis.Substring
 {
     public static class Semantics
     {

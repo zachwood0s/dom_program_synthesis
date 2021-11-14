@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.Features;
 
-namespace ProseTutorial
+namespace WebSynthesis
 {
     public class RankingScore : Feature<double>
     {

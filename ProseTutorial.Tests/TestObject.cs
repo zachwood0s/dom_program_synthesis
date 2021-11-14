@@ -17,8 +17,8 @@ using System.Text;
 using Microsoft.ProgramSynthesis.Wrangling.Tree;
 using HtmlAgilityPack;
 using System.Xml.Linq;
-using TreeManipulation;
-using RelationalProperties;
+using WebSynthesis.TreeManipulation;
+using WebSynthesis.RelationalProperties;
 
 namespace Tests.Utils
 {

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using Tests.Utils;
 
-namespace TreeManipulation
+namespace WebSynthesis.TreeManipulation
 {
 
     [TestClass]

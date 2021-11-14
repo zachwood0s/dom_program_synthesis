@@ -10,7 +10,7 @@ using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.Utils;
 using Microsoft.ProgramSynthesis.Wrangling.Tree;
 
-namespace TreeManipulation
+namespace WebSynthesis.TreeManipulation
 {
     public class WitnessFunctions : DomainLearningLogic
     {

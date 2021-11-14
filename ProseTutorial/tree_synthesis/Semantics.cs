@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.ProgramSynthesis.Wrangling.Tree;
 using HtmlAgilityPack;
 
-namespace TreeManipulation
+namespace WebSynthesis.TreeManipulation
 {
     public static class Semantics
     {

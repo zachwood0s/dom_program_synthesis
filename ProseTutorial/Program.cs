@@ -13,9 +13,9 @@ using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Learning.Strategies;
 using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.VersionSpace;
-using TreeManipulation;
+using WebSynthesis.TreeManipulation;
 
-namespace ProseTutorial
+namespace WebSynthesis
 {
     internal class Program
     {
@@ -35,9 +35,9 @@ namespace ProseTutorial
 
             var testObject = new WebscrapeTestObject(@"tree_synthesis/grammar/treemanim.grammar");
             testObject.Init(
-                g => new TreeManipulation.LikelihoodScore(g),
-                g => new TreeManipulation.WitnessFunctions(g),
-                typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly
+                g => new WebSynthesis.TreeManipulation.LikelihoodScore(g),
+                g => new WebSynthesis.TreeManipulation.WitnessFunctions(g),
+                typeof(WebSynthesis.TreeManipulation.Semantics).GetTypeInfo().Assembly
                 );
 
             testObject.CreateExample(
