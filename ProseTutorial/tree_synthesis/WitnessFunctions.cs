@@ -41,6 +41,8 @@ namespace WebSynthesis.TreeManipulation
         {
         }
 
+        #region Concat
+
         [WitnessFunction(nameof(Semantics.Concat), 0)]
         public DisjunctiveExamplesSpec WitnessConcat1(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
@@ -110,6 +112,10 @@ namespace WebSynthesis.TreeManipulation
             return new DisjunctiveExamplesSpec(result);
         }
 
+        #endregion
+
+
+        #region Children/Descendants/Single
 
         [WitnessFunction(nameof(Semantics.Children), 0)]
         public DisjunctiveExamplesSpec WitnessChildren(GrammarRule rule, DisjunctiveExamplesSpec spec)
@@ -220,6 +226,7 @@ namespace WebSynthesis.TreeManipulation
             return new DisjunctiveExamplesSpec(result);
         }
 
+        #endregion
 
         private CachedCalculation<ProseHtmlNode, HashSet<string>> allLabels
             = new CachedCalculation<ProseHtmlNode, HashSet<string>>( 
@@ -238,23 +245,25 @@ namespace WebSynthesis.TreeManipulation
             }
         }
 
-        [WitnessFunction(nameof(Semantics.KthDescendantWithTag), 0, DependsOnParameters = new[] { 1 })]
-        public DisjunctiveExamplesSpec WitnessFirstWithTag(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec tagSpec)
+        #region Descendants With Tag
+
+        [WitnessFunction(nameof(Semantics.DescendantsWithTag), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithTagSubseq(GrammarRule rule, DisjunctiveSubsequenceSpec spec, ExampleSpec tagSpec)
         {
             // Basically the same thing as Descendants but for a single node now
             var result = new Dictionary<State, IEnumerable<object>>();
 
-            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            foreach (KeyValuePair<State, IEnumerable<IEnumerable<object>>> example in spec.Examples)
             {
                 State inputState = example.Key;
                 var tag = tagSpec.Examples[inputState] as string;
                 var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
 
                 var occList = new List<ProseHtmlNode>();
-                foreach (ProseHtmlNode output in example.Value)
+                foreach (IEnumerable<object> output in example.Value)
                 {
                     var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
-                                      where Semantics.Descendants(i).Where(x => x.Name == tag).Contains(output)
+                                      where Semantics.Descendants(i).Where(x => x.Name == tag).ContainsSubsequence(output)
                                       select i;
 
                     occList.AddRange(occurrences);
@@ -267,18 +276,22 @@ namespace WebSynthesis.TreeManipulation
             return new DisjunctiveExamplesSpec(result);
         }
 
-        [WitnessFunction(nameof(Semantics.KthDescendantWithTag), 1)]
-        public DisjunctiveExamplesSpec WitnessFirstWithTag2(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        [WitnessFunction(nameof(Semantics.DescendantsWithTag), 1)]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithTag1Subseq(GrammarRule rule, DisjunctiveSubsequenceSpec spec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
-            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            foreach (KeyValuePair<State, IEnumerable<IEnumerable<object>>> example in spec.Examples)
             {
                 State inputState = example.Key;
                 var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
                 var possibilites = new List<string>();
-                foreach (ProseHtmlNode output in example.Value)
+                foreach (IEnumerable<object> output in example.Value)
                 {
-                    possibilites.Add(output.Name);
+                    var distinct = output.Cast<ProseHtmlNode>().Select(x => x.Name).Distinct();
+                    if (distinct.Count() > 1)
+                        return null;
+
+                    possibilites.Add(distinct.First());
                 }
 
                 if (possibilites.Count == 0)
@@ -289,103 +302,188 @@ namespace WebSynthesis.TreeManipulation
             return new DisjunctiveExamplesSpec(result);
         }
 
-        [WitnessFunction(nameof(Semantics.KthDescendantWithTag), 2, DependsOnParameters = new[] { 0, 1 })]
-        public DisjunctiveExamplesSpec WitnessFirstWithTag3(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec seqSpec, ExampleSpec tagSpec)
+        [WitnessFunction(nameof(Semantics.DescendantsWithTag), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithTag(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec tagSpec)
+        {
+            // Basically the same thing as Descendants but for a single node now
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var tag = tagSpec.Examples[inputState] as string;
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
+
+                var occList = new List<ProseHtmlNode>();
+                foreach (IEnumerable<ProseHtmlNode> output in example.Value)
+                {
+                    var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
+                                      where Semantics.Descendants(i).Where(x => x.Name == tag).SequenceEqual(output)
+                                      select i;
+
+                    occList.AddRange(occurrences);
+                }
+                
+                if (occList.Count == 0) 
+                    return null;
+                result[inputState] = occList.Distinct().ToList();
+            }
+            return new DisjunctiveExamplesSpec(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.DescendantsWithTag), 1)]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithTag1(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
             {
                 State inputState = example.Key;
-                var parent = seqSpec.Examples[example.Key] as ProseHtmlNode;
-                var tag = tagSpec.Examples[example.Key] as string;
                 var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
-                var possibilites = new List<int>();
-                foreach(ProseHtmlNode output in example.Value)
+                var possibilites = new List<string>();
+                foreach (IEnumerable<ProseHtmlNode> output in example.Value)
                 {
-                    var filtered = Semantics.Descendants(parent).Where(x => x.Name == tag);
-                    var nodeidx = filtered.IndexOf(output);
+                    var distinct = output.Select(x => x.Name).Distinct();
+                    if (distinct.Count() > 1)
+                        return null;
 
-                    if (nodeidx.HasValue)
-                    {
-                        possibilites.Add(nodeidx.Value);
-                        possibilites.Add(-(filtered.Count() - nodeidx.Value));
-                    }
+                    possibilites.Add(distinct.First());
                 }
 
                 if (possibilites.Count == 0)
                     return null;
-                result[inputState] = possibilites.Distinct().Cast<object>().ToList();
+                result[inputState] = possibilites.Distinct().ToList();
             }
 
             return new DisjunctiveExamplesSpec(result);
         }
 
-        [WitnessFunction(nameof(Semantics.MatchTag), 1)]
-        public DisjunctiveExamplesSpec WitnessMatchTag2(GrammarRule rule, ExampleSpec spec)
+        #endregion
+
+        #region Descendants With Attr
+
+        [WitnessFunction(nameof(Semantics.DescendantsWithAttr), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithAttrSubseq(GrammarRule rule, DisjunctiveSubsequenceSpec spec, ExampleSpec tagSpec)
         {
+            // Basically the same thing as Descendants but for a single node now
             var result = new Dictionary<State, IEnumerable<object>>();
-            foreach (KeyValuePair<State, object> example in spec.Examples)
+
+            foreach (KeyValuePair<State, IEnumerable<IEnumerable<object>>> example in spec.Examples)
             {
                 State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as ProseHtmlNode;
-                var output = (bool) example.Value;
+                var attr = tagSpec.Examples[inputState] as string;
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
 
-                // Find all of the possible labels in the given input tree
-                var labels = allLabels.GetValue(inputState[Grammar.InputSymbol] as ProseHtmlNode);
+                var occList = new List<ProseHtmlNode>();
+                foreach (IEnumerable<object> output in example.Value)
+                {
+                    var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
+                                      where Semantics.Descendants(i).Where(x => x[attr] != null).ContainsSubsequence(output)
+                                      select i;
 
-                if (output)
-                {
-                    // If this node is supposed to be included in the output, 
-                    // then the only possible label is the node's
-                    result[inputState] = new[] { input.Name };
+                    occList.AddRange(occurrences);
                 }
-                else
-                {
-                    // If this node is not supposed to be included in the output,
-                    // then the possible labels include every label except the node's
-                    result[inputState] = labels.Where(x => x != input.Name).ToHashSet();
-                }
+                
+                if (occList.Count == 0) 
+                    return null;
+                result[inputState] = occList.Distinct().ToList();
             }
             return new DisjunctiveExamplesSpec(result);
         }
 
-        private CachedCalculation<ProseHtmlNode, HashSet<ProseAttribute>> allAttributes
-            = new CachedCalculation<ProseHtmlNode, HashSet<ProseAttribute>>( 
-                input => new[] { input }.RecursiveSelect(x => x.ChildNodes)
-                                        .SelectMany(x => x.Attributes)
-                                        .ToHashSet()
-            );
-
-        [WitnessFunction(nameof(Semantics.MatchAttribute), 1)]
-        public DisjunctiveExamplesSpec WitnessMatchAttribute2(GrammarRule rule, ExampleSpec spec)
+        [WitnessFunction(nameof(Semantics.DescendantsWithAttr), 1)]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithAttr1Subseq(GrammarRule rule, DisjunctiveSubsequenceSpec spec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
-            foreach (KeyValuePair<State, object> example in spec.Examples)
+            foreach (KeyValuePair<State, IEnumerable<IEnumerable<object>>> example in spec.Examples)
             {
                 State inputState = example.Key;
-                var input = inputState[rule.Body[0]] as ProseHtmlNode;
-                var output = (bool) example.Value;
-
-                // Find all possible attributes in the tree
-                var allAttrs = allAttributes.GetValue(inputState[Grammar.InputSymbol] as ProseHtmlNode);
-                var allAttrNames = allAttrs.Select(x => x.Name);
-                var attrs = input.Attributes.Select(x => x.Name).ToHashSet();
-
-                if (output)
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
+                var possibilites = new List<string>();
+                foreach (IEnumerable<object> output in example.Value)
                 {
-                    // If this node is supposed to be included in the output,
-                    // then the only possible set of attributes is this node's attrs
-                    result[inputState] = attrs;
+                    var attrSets = output.Cast<ProseHtmlNode>().Select(x => x.Attributes);
+                    var resSet = new HashSet<string>(attrSets.First().Select(x => x.Name));
+                    foreach(var attrSet in attrSets)
+                    {
+                        var set = new HashSet<string>(attrSet.Select(x => x.Name));
+                        resSet.IntersectWith(set);
+                    }
+                    if (resSet.Count == 0)
+                        return null;
+
+                    possibilites.AddRange(resSet);
                 }
-                else
+
+                if (possibilites.Count == 0)
+                    return null;
+                result[inputState] = possibilites.Distinct().ToList();
+            }
+
+            return new DisjunctiveExamplesSpec(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.DescendantsWithAttr), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithAttr(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec tagSpec)
+        {
+            // Basically the same thing as Descendants but for a single node now
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var attr = tagSpec.Examples[inputState] as string;
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
+
+                var occList = new List<ProseHtmlNode>();
+                foreach (IEnumerable<ProseHtmlNode> output in example.Value)
                 {
-                    // If this node is not supposed to be included in the output,
-                    // then the possible labels include every other attribute found in the tree
-                    result[inputState] = allAttrNames.Where(x => !attrs.Contains(x)).ToHashSet();
+                    var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
+                                      where Semantics.Descendants(i).Where(x => x[attr] != null).SequenceEqual(output)
+                                      select i;
+
+                    occList.AddRange(occurrences);
                 }
+                
+                if (occList.Count == 0) 
+                    return null;
+                result[inputState] = occList.Distinct().ToList();
             }
             return new DisjunctiveExamplesSpec(result);
         }
+
+        [WitnessFunction(nameof(Semantics.DescendantsWithAttr), 1)]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithAttr1(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
+                var possibilites = new List<string>();
+                foreach (IEnumerable<ProseHtmlNode> output in example.Value)
+                {
+                    var attrSets = output.Select(x => x.Attributes);
+                    var resSet = new HashSet<string>(attrSets.First().Select(x => x.Name));
+                    foreach(var attrSet in attrSets)
+                    {
+                        var set = new HashSet<string>(attrSet.Select(x => x.Name));
+                        resSet.IntersectWith(set);
+                    }
+                    if (resSet.Count == 0)
+                        return null;
+
+                    possibilites.AddRange(resSet);
+                }
+
+                if (possibilites.Count == 0)
+                    return null;
+                result[inputState] = possibilites.Distinct().ToList();
+            }
+
+            return new DisjunctiveExamplesSpec(result);
+        }
+
+        #endregion
     }
 
 
@@ -445,6 +543,24 @@ namespace WebSynthesis.TreeManipulation
                 }
             }
             return true;
+        }
+
+        public static bool ContainsSubsequence<T>(this IEnumerable<T> parent, IEnumerable<T> target)
+        {
+            var pattern = target.ToArray();
+            var source = new LinkedList<T>();
+
+            foreach(var element in parent)
+            {
+                source.AddLast(element);
+                if(source.Count == pattern.Length)
+                {
+                    if (source.SequenceEqual(pattern))
+                        return true;
+                    source.RemoveFirst();
+                }
+            }
+            return false;
         }
     }
 }

@@ -231,16 +231,19 @@ namespace WebSynthesis.TreeManipulation
         public void TestLearnMatchTag()
         {
             testObject.CreateExample(
-                Html("<parent><special/><child2/></parent>"),
+                Html("<parent><special/><child2/><special id='hi'/></parent>"),
 
                 // Expected results
-                Html("<special/>"));
+                Html("<special/>"),
+                Html("<special id='hi'/>"));
 
             testObject.CreateExample(
-                Html("<parent><child2><special/></child2></parent>"),
+                Html("<parent><child2><special/></child2><special id='hi'/><special id='hi2'/></parent>"),
 
                 // Expected results
-                Html("<special/>"));
+                Html("<special/>"),
+                Html("<special id='hi'/>"),
+                Html("<special id='hi2'/>"));
 
             testObject.CreateTestCase(
                 Html("<parent><child1><child3/><special/></child1><child2/></parent>"),
@@ -291,6 +294,29 @@ namespace WebSynthesis.TreeManipulation
 
             testObject.CreateTestCase(
                 Html("<parent><child1 wrong='wrong'><child3/><special wrong='wrong'/></child1><child2 id='hello'/><child4/></parent>"),
+
+                Html("<child2 id='hello'/>"));
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestLearnKthChildByAttribute()
+        {
+            // Searching for nodes with an "id" attribute
+            testObject.CreateExample(
+                Html("<parent><special1 wrong='wrong'/><child2 id='hello'/><special2 id='goodbye' notImportant='eh'/></parent>"),
+
+                // Expected
+                Html("<special2 id='goodbye' notImportant='eh'/>"));
+
+            testObject.CreateExample(
+                Html("<parent><special1 id='hello'/><child2 id='hello'/><special2 id='goodbye' notImportant='eh'/></parent>"),
+
+                Html("<child2 id='hello'/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><child1 wrong='wrong'><child3/><special wrong='wrong'/></child1><notThis id='no'/><child2 id='hello'/><child4/></parent>"),
 
                 Html("<child2 id='hello'/>"));
 

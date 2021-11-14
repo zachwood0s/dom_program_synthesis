@@ -25,26 +25,17 @@ namespace WebSynthesis.TreeManipulation
         [FeatureCalculator(nameof(Semantics.Descendants))]
         public static double Descendants(double node) => LikelihoodScore.Descendants(node) + ReadabilityScore.Descendants(node); 
 
+        [FeatureCalculator(nameof(Semantics.DescendantsWithTag))]
+        public static double DescendantsWithTag(double node, double tag) => LikelihoodScore.DescendantsWithTag(node, tag) + ReadabilityScore.DescendantsWithTag(node, tag); 
+
+        [FeatureCalculator(nameof(Semantics.DescendantsWithAttr))]
+        public static double DescendantsWithAttr(double node, double tag) => LikelihoodScore.DescendantsWithAttr(node, tag) + ReadabilityScore.DescendantsWithAttr(node, tag); 
+
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => LikelihoodScore.Single(node) + ReadabilityScore.Single(node);
 
         [FeatureCalculator("SelectChild")]
         public static double SelectChild(double x, double k) => LikelihoodScore.SelectChild(x, k) + ReadabilityScore.SelectChild(x, k);
-
-        [FeatureCalculator("MatchNodes")]
-        public static double MatchNodes(double match, double rule) => LikelihoodScore.MatchNodes(match, rule) + ReadabilityScore.MatchNodes(match, rule); 
-
-        [FeatureCalculator(nameof(Semantics.MatchTag))]
-        public static double MatchTag(double node, double tag) => LikelihoodScore.MatchTag(node, tag) + ReadabilityScore.MatchTag(node, tag); 
-
-        [FeatureCalculator(nameof(Semantics.MatchAttribute))]
-        public static double MatchAttribute(double node, double attr) => LikelihoodScore.MatchAttribute(node, attr) + ReadabilityScore.MatchAttribute(node, attr);
-
-        [FeatureCalculator(nameof(Semantics.KthDescendantWithTag))]
-        public static double FirstWithTag(double nodes, double tag, double k) => LikelihoodScore.FirstWithTag(nodes, tag, k) + ReadabilityScore.FirstWithTag(nodes, tag, k); 
-
-        [FeatureCalculator(nameof(Semantics.True))]
-        public static double True() => LikelihoodScore.True() + ReadabilityScore.True();
 
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
         public static double ScoreK(int k) => LikelihoodScore.ScoreK(k) + ReadabilityScore.ScoreK(k);
@@ -80,26 +71,17 @@ namespace WebSynthesis.TreeManipulation
         [FeatureCalculator(nameof(Semantics.Descendants))]
         public static double Descendants(double node) => node - 1; 
 
+        [FeatureCalculator(nameof(Semantics.DescendantsWithTag))]
+        public static double DescendantsWithTag(double node, double tag) => node + tag; 
+
+        [FeatureCalculator(nameof(Semantics.DescendantsWithAttr))]
+        public static double DescendantsWithAttr(double node, double tag) => node + tag + discourage; 
+
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => node - 1;
 
         [FeatureCalculator("SelectChild")]
         public static double SelectChild(double x, double k) => x + k + discourage;
-
-        [FeatureCalculator("MatchNodes")]
-        public static double MatchNodes(double match, double rule) => match + rule + encourage; // Probably generates a more general solution than indexes
-
-        [FeatureCalculator(nameof(Semantics.MatchTag))]
-        public static double MatchTag(double node, double tag) => node + tag;
-
-        [FeatureCalculator(nameof(Semantics.MatchAttribute))]
-        public static double MatchAttribute(double node, double attr) => node + attr;
-
-        [FeatureCalculator(nameof(Semantics.KthDescendantWithTag))]
-        public static double FirstWithTag(double nodes, double tag, double k) => nodes + tag + k + encourage;
-
-        [FeatureCalculator(nameof(Semantics.True))]
-        public static double True() => stronglyDiscourage;
 
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
         public static double ScoreK(int k) => k != 0 ? 1 / k : 0;
@@ -131,26 +113,17 @@ namespace WebSynthesis.TreeManipulation
         [FeatureCalculator(nameof(Semantics.Descendants))]
         public static double Descendants(double node) => node + depthPenalty; 
 
+        [FeatureCalculator(nameof(Semantics.DescendantsWithTag))]
+        public static double DescendantsWithTag(double node, double tag) => node + tag + depthPenalty; 
+
+        [FeatureCalculator(nameof(Semantics.DescendantsWithAttr))]
+        public static double DescendantsWithAttr(double node, double tag) => node + tag + depthPenalty; 
+
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => node + depthPenalty;
 
         [FeatureCalculator("SelectChild")]
         public static double SelectChild(double x, double k) => x + k + depthPenalty;
-
-        [FeatureCalculator("MatchNodes")]
-        public static double MatchNodes(double match, double rule) => match + rule + depthPenalty; // Worse than just running the rule by itself
-
-        [FeatureCalculator(nameof(Semantics.MatchTag))]
-        public static double MatchTag(double node, double tag) => node + tag + depthPenalty;
-
-        [FeatureCalculator(nameof(Semantics.MatchAttribute))]
-        public static double MatchAttribute(double node, double attr) => node + attr + depthPenalty;
-
-        [FeatureCalculator(nameof(Semantics.KthDescendantWithTag))]
-        public static double FirstWithTag(double nodes, double tag, double k) => nodes + tag + k + depthPenalty;
-
-        [FeatureCalculator(nameof(Semantics.True))]
-        public static double True() => depthPenalty;
 
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
         public static double ScoreK(int k) => 0;

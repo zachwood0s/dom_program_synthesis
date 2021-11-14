@@ -13,7 +13,7 @@ using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Learning.Strategies;
 using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.VersionSpace;
-using WebSynthesis.TreeManipulation;
+using TreeManipulation;
 
 namespace WebSynthesis
 {
@@ -35,22 +35,31 @@ namespace WebSynthesis
 
             var testObject = new WebscrapeTestObject(@"tree_synthesis/grammar/treemanim.grammar");
             testObject.Init(
-                g => new WebSynthesis.TreeManipulation.LikelihoodScore(g),
-                g => new WebSynthesis.TreeManipulation.WitnessFunctions(g),
-                typeof(WebSynthesis.TreeManipulation.Semantics).GetTypeInfo().Assembly
+                g => new TreeManipulation.LikelihoodScore(g),
+                g => new TreeManipulation.WitnessFunctions(g),
+                typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly
                 );
 
             testObject.CreateExample(
                 "https://www.cs.purdue.edu/people/faculty/chjung.html",
 
                 // Expected Output
-                "<h1>Changhee Jung</h1>");
+                "<h1>Changhee Jung</h1>",
+                "<h3 style=\"color: #000;\">Associate Professor in Computer Science</h3>");
 
             testObject.CreateExample(
                 "https://www.cs.purdue.edu/people/faculty/bgstm.html",
 
                 // Expected Output
-                "<h1>Tony Bergstrom</h1>");
+                "<h1>Tony Bergstrom</h1>",
+                "<h3 style=\"color: #000;\">Assistant Professor of Practice</h3>");
+
+            testObject.CreateTestCase(
+                "https://www.cs.purdue.edu/people/faculty/clifton.html",
+
+                // Expected Output
+                "<h1>Christopher W. Clifton</h1>",
+                "<h3 style=\"color: #000;\">Professor of Computer Science</h3>");
 
             testObject.RunTest();
             Console.ReadKey();
@@ -191,9 +200,9 @@ namespace WebSynthesis
             return prose;
         }
     }
-     class TestObject<TIn, TOut>
-        where TOut : class
-        where TIn : class
+    class TestObject<TIn, TOut>
+       where TOut : class
+       where TIn : class
     {
         public List<Tuple<TIn, TOut>> Examples { get; private set; }
         public List<Tuple<TIn, TOut>> TestCases { get; private set; }
@@ -203,11 +212,14 @@ namespace WebSynthesis
         private SynthesisEngine _prose;
         private IFeature _score;
 
+        private ApplicationStrategy _strategy;
+
         public TestObject(string grammar)
         {
             Examples = new List<Tuple<TIn, TOut>>();
             TestCases = new List<Tuple<TIn, TOut>>();
             _GrammarPath = grammar;
+            _strategy = new ApplicationStrategy(grammar);
         }
 
 
@@ -225,11 +237,13 @@ namespace WebSynthesis
         {
             Examples.Clear();
             TestCases.Clear();
-            _prose.ClearLearningCache();
+            _strategy.Clear();
+            //_prose.ClearLearningCache();
         }
 
         public void Init(Func<Grammar, IFeature> scoreGen, Func<Grammar, DomainLearningLogic> witnessCreator, params Assembly[] assemblies)
         {
+            /*
             Result<Grammar> grammar = compileGrammar(assemblies);
 
             if (grammar.HasErrors)
@@ -241,36 +255,38 @@ namespace WebSynthesis
 
             SynthesisEngine prose = configureSynthesis(_grammar, witnessCreator);
             _prose = prose;
+            */
+            _strategy.Init(scoreGen, witnessCreator, assemblies);
         }
 
         public void RunTest()
         {
+            var casted = Examples.Select(x => new Tuple<object, object>(x.Item1, x.Item2));
+            var learnedSet = _strategy.GetProgramSet(casted);
+            /*
             var spec = getExampleSpec(_grammar);
 
             ProgramSet learnedSet = _prose.LearnGrammarTopK(spec, _score, k: 1);
+            */
             IEnumerable<ProgramNode> programs = learnedSet.RealizedPrograms;
-
-            if (programs.Count() == 0)
-                throw new Exception("no learned");
-                //Assert.Fail("No programs were learned.");
 
             Console.WriteLine($"Picking best program: {programs.First()}");
 
-            foreach(var example in Examples)
+            foreach (var example in Examples)
             {
-                runRealizedProgramWith(programs.First(), _grammar, example.Item1, example.Item2);
+                runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
             }
 
             foreach (var example in TestCases)
             {
-                runRealizedProgramWith(programs.First(), _grammar, example.Item1, example.Item2);
+                runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
             }
         }
 
         private void runRealizedProgramWith(ProgramNode program, Grammar grammar, TIn input, TOut output)
         {
             State state = State.CreateForExecution(grammar.InputSymbol, input);
-            AssertTruth(output, program.Invoke(state));
+            Console.WriteLine(program.Invoke(state));
         }
 
         private ExampleSpec getExampleSpec(Grammar grammar)
@@ -303,11 +319,6 @@ namespace WebSynthesis
             });
         }
 
-        protected virtual void AssertTruth(TOut expected, object actual)
-        {
-
-            //Assert.AreEqual(expected, actual as TOut);
-        }
     }
 
     class SequenceTestObject<TIn, TOut> : TestObject<TIn, IEnumerable<TOut>>
@@ -317,11 +328,6 @@ namespace WebSynthesis
 
         public SequenceTestObject(string grammar) 
             : base(grammar) {}
-
-        protected override void AssertTruth(IEnumerable<TOut> expected, object actual)
-        {
-            //Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
-        }
 
         public void CreateExample(TIn input, params TOut[] outs)
         {
@@ -359,10 +365,6 @@ namespace WebSynthesis
             CreateTestCase(node, outNodes);
         }
 
-        protected override void AssertTruth(IEnumerable<ProseHtmlNode> expected, object actual)
-        {
-            //Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
-        }
 
         private ProseHtmlNode ParseFromString(string html)
         {

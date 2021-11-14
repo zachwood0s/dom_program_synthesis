@@ -89,7 +89,7 @@ namespace WebSynthesis.RelationalProperties
             var spec = GetExampleSpec(pExamples);
             var res = _prose.LearnGrammarTopK(spec, _score, k: 1, cancel: ct);
 
-            _log.SaveLogToXML("synthesis_log.xml");
+            //_log.SaveLogToXML("synthesis_log.xml");
             return res;
         }
 
