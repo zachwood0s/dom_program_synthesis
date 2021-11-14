@@ -40,6 +40,9 @@ namespace TreeManipulation
         [FeatureCalculator(nameof(Semantics.MatchAttribute))]
         public static double MatchAttribute(double node, double attr) => LikelihoodScore.MatchAttribute(node, attr) + ReadabilityScore.MatchAttribute(node, attr);
 
+        [FeatureCalculator(nameof(Semantics.KthDescendantWithTag))]
+        public static double FirstWithTag(double nodes, double tag, double k) => LikelihoodScore.FirstWithTag(nodes, tag, k) + ReadabilityScore.FirstWithTag(nodes, tag, k); 
+
         [FeatureCalculator(nameof(Semantics.True))]
         public static double True() => LikelihoodScore.True() + ReadabilityScore.True();
 
@@ -65,6 +68,7 @@ namespace TreeManipulation
         private const int stronglyDiscourage = -10;
         private const int discourage = -2;
         private const int encourage = 2;
+        private const int stronglyEncourage = 10;
         protected override double GetFeatureValueForVariable(VariableNode variable) => 0;
 
         [FeatureCalculator(nameof(Semantics.Concat))]
@@ -91,6 +95,9 @@ namespace TreeManipulation
         [FeatureCalculator(nameof(Semantics.MatchAttribute))]
         public static double MatchAttribute(double node, double attr) => node + attr;
 
+        [FeatureCalculator(nameof(Semantics.KthDescendantWithTag))]
+        public static double FirstWithTag(double nodes, double tag, double k) => nodes + tag + k + encourage;
+
         [FeatureCalculator(nameof(Semantics.True))]
         public static double True() => stronglyDiscourage;
 
@@ -112,34 +119,38 @@ namespace TreeManipulation
         {
             //Microsoft.ProgramSynthesis.Rules.Concepts.
         }
+        private const int depthPenalty = -10;
         protected override double GetFeatureValueForVariable(VariableNode variable) => 0;
 
         [FeatureCalculator(nameof(Semantics.Concat))]
-        public static double Concat(double a, double b) => a + b - 1;
+        public static double Concat(double a, double b) => a + b + depthPenalty;
 
         [FeatureCalculator(nameof(Semantics.Children))]
-        public static double Children(double node) => node - 1; // Favor children over descendants
+        public static double Children(double node) => node + depthPenalty; // Favor children over descendants
 
         [FeatureCalculator(nameof(Semantics.Descendants))]
-        public static double Descendants(double node) => node - 1; 
+        public static double Descendants(double node) => node + depthPenalty; 
 
         [FeatureCalculator(nameof(Semantics.Single))]
-        public static double Single(double node) => node - 1;
+        public static double Single(double node) => node + depthPenalty;
 
         [FeatureCalculator("SelectChild")]
-        public static double SelectChild(double x, double k) => x + k - 1;
+        public static double SelectChild(double x, double k) => x + k + depthPenalty;
 
         [FeatureCalculator("MatchNodes")]
-        public static double MatchNodes(double match, double rule) => match + rule - 1; // Worse than just running the rule by itself
+        public static double MatchNodes(double match, double rule) => match + rule + depthPenalty; // Worse than just running the rule by itself
 
         [FeatureCalculator(nameof(Semantics.MatchTag))]
-        public static double MatchTag(double node, double tag) => node + tag - 1;
+        public static double MatchTag(double node, double tag) => node + tag + depthPenalty;
 
         [FeatureCalculator(nameof(Semantics.MatchAttribute))]
-        public static double MatchAttribute(double node, double attr) => node + attr - 1;
+        public static double MatchAttribute(double node, double attr) => node + attr + depthPenalty;
+
+        [FeatureCalculator(nameof(Semantics.KthDescendantWithTag))]
+        public static double FirstWithTag(double nodes, double tag, double k) => nodes + tag + k + depthPenalty;
 
         [FeatureCalculator(nameof(Semantics.True))]
-        public static double True() => -1;
+        public static double True() => depthPenalty;
 
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
         public static double ScoreK(int k) => 0;

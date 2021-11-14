@@ -27,6 +27,17 @@ namespace TreeManipulation
             return new List<ProseHtmlNode>{node};
         }
 
+        public static ProseHtmlNode KthDescendantWithTag(ProseHtmlNode node, string tag, int k)
+        {
+            var filtered = Descendants(node).Where(x => x.Name == tag);
+            if(k < 0)
+            {
+                return filtered.ElementAt(filtered.Count() + k);
+            }
+
+            return filtered.ElementAt(k);
+        }
+
         public static bool MatchTag(ProseHtmlNode n, string tag)
         {
             return n.Name.Equals(tag);

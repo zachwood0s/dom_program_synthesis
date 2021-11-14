@@ -24,8 +24,9 @@ IReadOnlyList<ProseHtmlNode> nodes
 	 | Single(subTree)
 
 ProseHtmlNode subTree 
-	:= tree
+	:= KthDescendantWithTag(subTree, tag, k) // Needed because disjunctive filter doesn't work
 	 | SelectChild(rule, k) = Kth(rule, k)
+	 | tree
 
 bool match 
 	:= MatchTag(x, tag)

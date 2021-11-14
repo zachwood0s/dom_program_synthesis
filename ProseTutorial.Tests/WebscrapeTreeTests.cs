@@ -21,7 +21,7 @@ namespace TreeManipulation
             testObject = new WebscrapeTestObject(_GrammarPath);
 
             testObject.Init(
-                g => new LikelihoodScore(g),
+                g => new RankingScore(g),
                 g => new WitnessFunctions(g),
                 typeof(Semantics).GetTypeInfo().Assembly
                 );

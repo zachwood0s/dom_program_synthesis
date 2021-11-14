@@ -134,7 +134,7 @@ namespace TreeManipulation
                 // Expected results
                 Html("<childImportant><child3/></childImportant>"));
 
-            testObject.CreateTestCase(
+            testObject.CreateExample(
                 Html("<parent><child1><child3/></child1><secondChild/></parent>"),
 
                 // Expected results
@@ -152,7 +152,7 @@ namespace TreeManipulation
                 Html("<this/>"),
                 Html("<that/>"));
 
-            testObject.CreateTestCase(
+            testObject.CreateExample(
                 Html("<parent><no/><p><yes1/><yes2/></p></parent>"),
 
                 // Expected results
@@ -173,7 +173,7 @@ namespace TreeManipulation
                 //Html("<that/>"));
 
             testObject.CreateExample(
-                Html("<parent><child1><none1/></child1><child2><special/><that/></child2><none2/></parent>"),
+                Html("<parent><child1><none1/></child1><secondChild><special/><that/></secondChild><none2/></parent>"),
 
                 // Expected results
                 Html("<special/>"));
@@ -195,8 +195,8 @@ namespace TreeManipulation
             testObject.CreateExample(
                 Html(@"<parent>
                         <childNot/>
-                        <child1 id='this one'/>
                         <child1/>
+                        <child1 id='this one'/>
                         <child3/>
                        </parent>"),
 
@@ -207,19 +207,20 @@ namespace TreeManipulation
                 Html(@"<parent>
                         <nope>
                             <childNot/>
-                            <child1 class='that one'/>
+                            <child1 id='first'/>
                         </nope>
-                        <child1 id='last'/>
+                        <firstChild/>
+                        <child1 class='that one'/>
                        </parent>"),
 
                 // Expected results
                 Html("<child1 class='that one'/>"));
 
             testObject.CreateTestCase(
-                Html("<parent><child2/><nope><nope><child1 id='first'/><child1/></nope></nope></parent>"),
+                Html("<parent><child2/><nope><nope><child1/><child1 id='last'/></nope></nope></parent>"),
 
                 // Expected results
-                Html("<child1 id='first'/>"));
+                Html("<child1 id='last'/>"));
 
             testObject.RunTest();
 
@@ -260,7 +261,7 @@ namespace TreeManipulation
                 Html("<special1/>"),
                 Html("<special2/>"));
 
-            testObject.CreateTestCase(
+            testObject.CreateExample(
                 Html("<parent><child1><child3/><special/></child1><child2/><child4/></parent>"),
 
                 // Expected results
