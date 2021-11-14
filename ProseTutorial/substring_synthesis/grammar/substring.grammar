@@ -9,12 +9,10 @@ language Substring;
 
 @start string program := str
 
-string str := TakeFirst(oneList) | v
+string str := TakeFirst(subStrs) | JoinList(subStrs, c) | v
 
-IReadOnlyList<string> oneList := JoinList(concat, c) | select
-
-IReadOnlyList<string> concat := Concat(concat, select) | select
-
+IReadOnlyList<string> subStrs := Concat(subStrs, select) | select
+							
 IReadOnlyList<string> select := SelectK(split, k) 
 							  | SelectRegex(split, r)
 

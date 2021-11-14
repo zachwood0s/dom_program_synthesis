@@ -31,9 +31,9 @@ namespace SubstringSynthesis
             return l.First();
         }
 
-        public static IReadOnlyList<string> JoinList(IReadOnlyList<string> l, char c)
+        public static string JoinList(IReadOnlyList<string> l, char c)
         {
-            return new List<string>() { string.Join(c, l) };
+            return string.Join(c, l);
         }
 
 

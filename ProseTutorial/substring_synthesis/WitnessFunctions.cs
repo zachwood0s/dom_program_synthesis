@@ -102,11 +102,9 @@ namespace SubstringSynthesis
                 State inputState = example.Key;
                 var chars = new HashSet<char>();
 
-                foreach (IReadOnlyList<string> output in example.Value)
+                foreach (string output in example.Value)
                 {
-                    if (output.Count != 1) continue;
-
-                    List<char> newChars = output.First().Distinct().ToList();
+                    List<char> newChars = output.Distinct().ToList();
                     chars = chars.Concat(newChars).ToHashSet();
                 }
 
@@ -129,12 +127,10 @@ namespace SubstringSynthesis
 
                 char c = (char) charSpec.Examples[inputState];
 
-                foreach (IReadOnlyList<string> output in example.Value)
+                foreach (string output in example.Value)
                 {
-                    if (output.Count != 1) continue;
-
-                    if (output.First().Contains(c))
-                        lists.Add(output.First().Split(c));
+                    if (output.Contains(c))
+                        lists.Add(output.Split(c));
                 }
 
                 if (lists.Count == 0) return null;
