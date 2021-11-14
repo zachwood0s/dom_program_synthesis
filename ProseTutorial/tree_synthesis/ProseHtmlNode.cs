@@ -65,6 +65,7 @@ namespace TreeManipulation
         private int _line;
         private int _col;
         private int? _cachedHashCode;
+        private List<ProseHtmlNode> _cachedDescendants;
 
         public IReadOnlyList<ProseHtmlNode> ChildNodes => _childNodes;
         public IEnumerable<ProseAttribute> Attributes => _attributes.Values;
@@ -73,8 +74,18 @@ namespace TreeManipulation
         public HtmlNodeType Type => _type;
         public string Text => _text;
 
-        public IEnumerable<ProseHtmlNode> Descendants 
-            => _childNodes.RecursiveSelect(x => x.ChildNodes);
+
+        public IEnumerable<ProseHtmlNode> Descendants
+        {
+            get
+            {
+                if (_cachedDescendants == null)
+                {
+                    _cachedDescendants = _childNodes.RecursiveSelect(x => x.ChildNodes).ToList();
+                }
+                return _cachedDescendants;
+            }
+        }
 
         public ProseAttribute? this[string key]
             => _attributes.TryGetValue(key, out var val) ? val : (ProseAttribute?) null;

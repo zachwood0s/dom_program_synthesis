@@ -300,5 +300,28 @@ namespace TreeManipulation
             testObject.RunTest();
         }
 
+        [TestMethod]
+        public void TestLearnKthChildByAttribute()
+        {
+            // Searching for nodes with an "id" attribute
+            testObject.CreateExample(
+                Html("<parent><special1 wrong='wrong'/><child2 id='hello'/><special2 id='goodbye' notImportant='eh'/></parent>"),
+
+                // Expected
+                Html("<special2 id='goodbye' notImportant='eh'/>"));
+
+            testObject.CreateExample(
+                Html("<parent><special1 id='hello'/><child2 id='hello'/><special2 id='goodbye' notImportant='eh'/></parent>"),
+
+                Html("<child2 id='hello'/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><child1 wrong='wrong'><child3/><special wrong='wrong'/></child1><notThis id='no'/><child2 id='hello'/><child4/></parent>"),
+
+                Html("<child2 id='hello'/>"));
+
+            testObject.RunTest();
+        }
+
     }
 }

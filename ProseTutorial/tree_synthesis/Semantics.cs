@@ -27,20 +27,19 @@ namespace TreeManipulation
             return new List<ProseHtmlNode>{node};
         }
 
+        private static Dictionary<Tuple<string, ProseHtmlNode>, IReadOnlyList<ProseHtmlNode>> _cached = new Dictionary<Tuple<string, ProseHtmlNode>, IReadOnlyList<ProseHtmlNode>>();
         public static IReadOnlyList<ProseHtmlNode> DescendantsWithTag(ProseHtmlNode node, string tag)
         {
-            return node.Descendants.Where(x => x.Name == tag).ToList();
+            var key = Tuple.Create(tag, node);
+            if (_cached.TryGetValue(key, out var res))
+                return res;
+            var newList = node.Descendants.Where(x => x.Name == tag).ToList();
+            _cached[key] = newList;
+            return newList;
         }
-
-        public static ProseHtmlNode KthDescendantWithTag(ProseHtmlNode node, string tag, int k)
+        public static IReadOnlyList<ProseHtmlNode> DescendantsWithAttr(ProseHtmlNode node, string attr)
         {
-            var filtered = Descendants(node).Where(x => x.Name == tag);
-            if(k < 0)
-            {
-                return filtered.ElementAt(filtered.Count() + k);
-            }
-
-            return filtered.ElementAt(k);
+            return node.Descendants.Where(x => x[attr] != null).ToList();
         }
 
         public static bool MatchTag(ProseHtmlNode n, string tag)
