@@ -231,16 +231,19 @@ namespace TreeManipulation
         public void TestLearnMatchTag()
         {
             testObject.CreateExample(
-                Html("<parent><special/><child2/></parent>"),
+                Html("<parent><special/><child2/><special id='hi'/></parent>"),
 
                 // Expected results
-                Html("<special/>"));
+                Html("<special/>"),
+                Html("<special id='hi'/>"));
 
             testObject.CreateExample(
-                Html("<parent><child2><special/></child2></parent>"),
+                Html("<parent><child2><special/></child2><special id='hi'/><special id='hi2'/></parent>"),
 
                 // Expected results
-                Html("<special/>"));
+                Html("<special/>"),
+                Html("<special id='hi'/>"),
+                Html("<special id='hi2'/>"));
 
             testObject.CreateTestCase(
                 Html("<parent><child1><child3/><special/></child1><child2/></parent>"),

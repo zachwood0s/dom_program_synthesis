@@ -25,6 +25,9 @@ namespace TreeManipulation
         [FeatureCalculator(nameof(Semantics.Descendants))]
         public static double Descendants(double node) => LikelihoodScore.Descendants(node) + ReadabilityScore.Descendants(node); 
 
+        [FeatureCalculator(nameof(Semantics.DescendantsWithTag))]
+        public static double DescendantsWithTag(double node, double tag) => LikelihoodScore.DescendantsWithTag(node, tag) + ReadabilityScore.DescendantsWithTag(node, tag); 
+
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => LikelihoodScore.Single(node) + ReadabilityScore.Single(node);
 
@@ -80,6 +83,9 @@ namespace TreeManipulation
         [FeatureCalculator(nameof(Semantics.Descendants))]
         public static double Descendants(double node) => node - 1; 
 
+        [FeatureCalculator(nameof(Semantics.DescendantsWithTag))]
+        public static double DescendantsWithTag(double node, double tag) => node + tag; 
+
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => node - 1;
 
@@ -130,6 +136,9 @@ namespace TreeManipulation
 
         [FeatureCalculator(nameof(Semantics.Descendants))]
         public static double Descendants(double node) => node + depthPenalty; 
+
+        [FeatureCalculator(nameof(Semantics.DescendantsWithTag))]
+        public static double DescendantsWithTag(double node, double tag) => node + tag + depthPenalty; 
 
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => node + depthPenalty;

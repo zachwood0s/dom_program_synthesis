@@ -27,6 +27,11 @@ namespace TreeManipulation
             return new List<ProseHtmlNode>{node};
         }
 
+        public static IReadOnlyList<ProseHtmlNode> DescendantsWithTag(ProseHtmlNode node, string tag)
+        {
+            return node.Descendants.Where(x => x.Name == tag).ToList();
+        }
+
         public static ProseHtmlNode KthDescendantWithTag(ProseHtmlNode node, string tag, int k)
         {
             var filtered = Descendants(node).Where(x => x.Name == tag);

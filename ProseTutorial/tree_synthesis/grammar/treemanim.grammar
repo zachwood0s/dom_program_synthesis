@@ -15,23 +15,24 @@ language TreeManim;
 
 IReadOnlyList<ProseHtmlNode> rule
 	:= Concat(rule, rule)
-	 | MatchNodes(match, nodes) = Filter(\x: ProseHtmlNode => match, nodes)
+//	 | MatchNodes(match, nodes) = Filter(\x: ProseHtmlNode => match, nodes)
 	 | nodes
 
 IReadOnlyList<ProseHtmlNode> nodes 
 	:= Children(subTree)
      | Descendants(subTree)
 	 | Single(subTree)
+	 | DescendantsWithTag(subTree, tag) // Needed because disjunctive filter doesn't work
 
 ProseHtmlNode subTree 
 	:= KthDescendantWithTag(subTree, tag, k) // Needed because disjunctive filter doesn't work
 	 | SelectChild(rule, k) = Kth(rule, k)
 	 | tree
 
-bool match 
-	:= MatchTag(x, tag)
-	 | MatchAttribute(x, attr)
-	 | True()
+//bool match 
+//	:= MatchTag(x, tag)
+//	 | MatchAttribute(x, attr)
+//	 | True()
 
 string tag;
 string attr;

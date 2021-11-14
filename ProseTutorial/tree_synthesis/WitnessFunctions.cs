@@ -238,8 +238,63 @@ namespace TreeManipulation
             }
         }
 
+        [WitnessFunction(nameof(Semantics.DescendantsWithTag), 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithTag(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec tagSpec)
+        {
+            // Basically the same thing as Descendants but for a single node now
+            var result = new Dictionary<State, IEnumerable<object>>();
+
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var tag = tagSpec.Examples[inputState] as string;
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
+
+                var occList = new List<ProseHtmlNode>();
+                foreach (IEnumerable<ProseHtmlNode> output in example.Value)
+                {
+                    var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
+                                      where Semantics.Descendants(i).Where(x => x.Name == tag).SequenceEqual(output)
+                                      select i;
+
+                    occList.AddRange(occurrences);
+                }
+                
+                if (occList.Count == 0) 
+                    return null;
+                result[inputState] = occList.Distinct().ToList();
+            }
+            return new DisjunctiveExamplesSpec(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.DescendantsWithTag), 1)]
+        public DisjunctiveExamplesSpec WitnessDescendantsWithTag(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var input = new[] { inputState[Grammar.InputSymbol] as ProseHtmlNode };
+                var possibilites = new List<string>();
+                foreach (IEnumerable<ProseHtmlNode> output in example.Value)
+                {
+                    var distinct = output.Select(x => x.Name).Distinct();
+                    if (distinct.Count() > 1)
+                        return null;
+
+                    possibilites.Add(distinct.First());
+                }
+
+                if (possibilites.Count == 0)
+                    return null;
+                result[inputState] = possibilites.Distinct().ToList();
+            }
+
+            return new DisjunctiveExamplesSpec(result);
+        }
+
         [WitnessFunction(nameof(Semantics.KthDescendantWithTag), 0, DependsOnParameters = new[] { 1 })]
-        public DisjunctiveExamplesSpec WitnessFirstWithTag(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec tagSpec)
+        public DisjunctiveExamplesSpec WitnessDescendantWithTag1(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec tagSpec)
         {
             // Basically the same thing as Descendants but for a single node now
             var result = new Dictionary<State, IEnumerable<object>>();
@@ -268,7 +323,7 @@ namespace TreeManipulation
         }
 
         [WitnessFunction(nameof(Semantics.KthDescendantWithTag), 1)]
-        public DisjunctiveExamplesSpec WitnessFirstWithTag2(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        public DisjunctiveExamplesSpec WitnessDescendantWithTag2(GrammarRule rule, DisjunctiveExamplesSpec spec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
@@ -290,7 +345,7 @@ namespace TreeManipulation
         }
 
         [WitnessFunction(nameof(Semantics.KthDescendantWithTag), 2, DependsOnParameters = new[] { 0, 1 })]
-        public DisjunctiveExamplesSpec WitnessFirstWithTag3(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec seqSpec, ExampleSpec tagSpec)
+        public DisjunctiveExamplesSpec WitnessDescendantWithTag3(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec seqSpec, ExampleSpec tagSpec)
         {
             var result = new Dictionary<State, IEnumerable<object>>();
             foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
