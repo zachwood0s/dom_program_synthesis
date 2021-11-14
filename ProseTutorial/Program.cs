@@ -13,7 +13,9 @@ using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Learning.Strategies;
 using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.VersionSpace;
-using TreeManipulation;
+using WebSynthesis.RelationalProperties;
+using WebSynthesis.TreeManipulation;
+using WebSynthesis.TreeManipulation;
 
 namespace WebSynthesis
 {
