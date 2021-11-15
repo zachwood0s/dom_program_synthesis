@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.ProgramSynthesis" Version="8.3.0" />
     <PackageReference Include="Microsoft.ProgramSynthesis.Common" Version="8.3.0" />
-    <PackageReference Include="Microsoft.ProgramSynthesis.Compiler" Version="8.3.0" />
   </ItemGroup>
+
 
 </Project>

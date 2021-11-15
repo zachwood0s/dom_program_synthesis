@@ -1,0 +1,35 @@
+﻿using WebSynthesis.TreeManipulation;
+
+using semantics WebSynthesis.TreeManipulation.Semantics;
+using learners WebSynthesis.TreeManipulation.WitnessFunctions;
+
+language WebSynthesis.TreeManipulation;
+
+@complete feature double Score = WebSynthesis.TreeManipulation.RankingScore,
+								 WebSynthesis.TreeManipulation.LikelihoodScore,
+								 WebSynthesis.TreeManipulation.ReadabilityScore;
+
+@input ProseHtmlNode tree;
+
+@start IReadOnlyList<ProseHtmlNode> program := rule;
+
+IReadOnlyList<ProseHtmlNode> rule
+	:= Concat(rule, rule)
+	 | nodes
+
+IReadOnlyList<ProseHtmlNode> nodes 
+	:= Children(subTree)
+     | Descendants(subTree)
+	 | Single(subTree)
+	 | DescendantsWithTag(subTree, tag) // Needed because disjunctive filter doesn't work
+	 | DescendantsWithAttr(subTree, attr) // Needed because disjunctive filter doesn't work
+
+ProseHtmlNode subTree 
+	:= SelectChild(rule, k) = Kth(rule, k)
+	 | tree
+
+string tag;
+string attr;
+string value;
+int k; 
+

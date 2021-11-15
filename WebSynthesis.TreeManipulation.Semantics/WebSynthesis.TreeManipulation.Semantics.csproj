@@ -5,9 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
     <PackageReference Include="Microsoft.ProgramSynthesis" Version="8.3.0" />
     <PackageReference Include="Microsoft.ProgramSynthesis.Common" Version="8.3.0" />
-    <PackageReference Include="Microsoft.ProgramSynthesis.Compiler" Version="8.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebSynthesis.Shared\WebSynthesis.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,7 +18,7 @@ namespace WebSynthesis.Substring
     [TestClass]
     public class SubstringTests
     {
-        private const string _GrammarPath = @"../../../../ProseTutorial/substring_synthesis/grammar/substring.grammar";
+        private const string _GrammarPath = @"WebSynthesis.Substring.grammar";
         private static TestObject<string, string> testObject;
 
         [ClassInitialize]

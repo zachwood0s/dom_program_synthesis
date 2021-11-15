@@ -2,7 +2,24 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
+    <PackageReference Include="Microsoft.ProgramSynthesis" Version="8.3.0" />
+    <PackageReference Include="Microsoft.ProgramSynthesis.Compiler" Version="8.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebSynthesis.Shared\WebSynthesis.Shared.csproj" />
+    <ProjectReference Include="..\WebSynthesis.Substring.Semantics\WebSynthesis.Substring.Semantics.csproj" />
+    <ProjectReference Include="..\WebSynthesis.Substring\WebSynthesis.Substring.csproj" />
+    <ProjectReference Include="..\WebSynthesis.TreeManipulation.Semantics\WebSynthesis.TreeManipulation.Semantics.csproj" />
+    <ProjectReference Include="..\WebSynthesis.TreeManipulation\WebSynthesis.TreeManipulation.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\WebSynthesis.TreeManipulation\WebSynthesis.TreeManipulation.grammar" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>

@@ -131,7 +131,8 @@ namespace WebSynthesis.RelationalProperties
                 outSet.Add(Tuple.Create(input, output));
                 foreach(var prop in properties)
                 {
-                    outSet.UnionWith(prop.ApplyProperty(input, output).ToHashSet());
+                    if(input.GetType().IsAssignableFrom(prop.Type))
+                        outSet.UnionWith(prop.ApplyProperty(input, output).ToHashSet());
                 }
             }
             return outSet;

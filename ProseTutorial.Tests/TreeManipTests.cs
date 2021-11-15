@@ -22,7 +22,7 @@ namespace WebSynthesis.TreeManipulation
     [TestClass]
     public class TreeManipTest
     {
-        private const string _GrammarPath = @"../../../../ProseTutorial/TreeManipulation/grammar/treemanim.grammar";
+        private const string _GrammarPath = @"WebSynthesis.TreeManipulation.grammar";
         private static HtmlSequenceTestObject testObject;
 
         private static StructNode TN(string label)

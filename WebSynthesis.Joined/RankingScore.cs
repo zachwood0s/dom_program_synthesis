@@ -11,6 +11,12 @@ namespace WebSynthesis.Joined
         {
         }
 
+        [FeatureCalculator("JoinMap")]
+        public static double JoinMap(double substring, double nodes)
+        {
+            return substring + nodes;
+        }
+
         [FeatureCalculator(nameof(Semantics.NodesToStrs))]
         public static double NodesToStrs(double nodes)
         {

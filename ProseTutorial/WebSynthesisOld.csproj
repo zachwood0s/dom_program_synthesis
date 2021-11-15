@@ -7,25 +7,9 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Joined.Language.Grammar.g.cs" />
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Joined.Language.TrainedFeatures.g.cs" />
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Joined.Language.Utilities.g.cs" />
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Substring.Language.Grammar.g.cs" />
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Substring.Language.TrainedFeatures.g.cs" />
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Substring.Language.Utilities.g.cs" />
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.TreeManipulation.Language.Grammar.g.cs" />
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.TreeManipulation.Language.TrainedFeatures.g.cs" />
-    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.TreeManipulation.Language.Utilities.g.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
     <PackageReference Include="Microsoft.ProgramSynthesis" Version="8.3.0" />
     <PackageReference Include="Microsoft.ProgramSynthesis.Compiler" Version="8.3.0" />
-    <PackageReference Include="Microsoft.ProgramSynthesis.DslcTargets" Version="8.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <DotNetCliToolReference Include="Microsoft.ProgramSynthesis.Dslc" Version="8.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="WebSynthesis.Substring\WebSynthesis.Substring.grammar">

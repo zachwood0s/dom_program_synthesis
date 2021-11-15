@@ -17,7 +17,7 @@ language JoinedSynthesis;
 @start IReadOnlyList<string> program := strs
 
 IReadOnlyList<string> strs := JoinMap(substring, nodeStrs) = Map(\str: string => substring, nodeStrs);
-string substring := @id['Selection'] @subst[v := str] Substring.program;
+string substring := @id['StringSelection'] @subst[v := str] Substring.program;
 
 IReadOnlyList<string> nodeStrs := NodesToStrs(nodes)
-IReadOnlyList<ProseHtmlNode> nodes := @id['Selection'] @subst[tree := inTree] Tree.program;
+IReadOnlyList<ProseHtmlNode> nodes := @id['NodeSelection'] @subst[tree := inTree] Tree.program;

@@ -10,6 +10,7 @@ namespace WebSynthesis.RelationalProperties
     {
         IEnumerable<Tuple<object, object>> ApplyProperty(object input, object output);
         string Name { get; }
+        Type Type { get; }
     }
 
     [System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]

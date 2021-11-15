@@ -34,8 +34,11 @@ namespace WebSynthesis.Joined
                 CompilerReference.FromAssemblyFiles(typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly));
 
             var joinedGrammar = Utils.LoadGrammar("WebSynthesis.Joined.grammar",
-                CompilerReference.FromAssemblyFiles(typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly,
-                                                    typeof(Substring.Semantics).GetTypeInfo().Assembly));
+                CompilerReference.FromAssemblyFiles(typeof(Joined.Semantics).GetTypeInfo().Assembly,
+                                                    typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly,
+                                                    typeof(Substring.Semantics).GetTypeInfo().Assembly,
+                                                    typeof(TreeManipulation.Language).GetTypeInfo().Assembly,
+                                                    typeof(Substring.Language).GetTypeInfo().Assembly));
 
             testObject = new WebscrapeTestObject("WebSynthesis.Joined.grammar");
 
