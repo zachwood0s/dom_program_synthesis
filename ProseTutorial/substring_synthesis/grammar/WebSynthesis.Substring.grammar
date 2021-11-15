@@ -1,11 +1,12 @@
-﻿using semantics WebSynthesis.Substring.Semantics;
+﻿using Microsoft.ProgramSynthesis.DslLibrary;
+using Microsoft.ProgramSynthesis.Utils;
+
+using semantics WebSynthesis.Substring.Semantics;
 using learners WebSynthesis.Substring.WitnessFunctions;
 
 language WebSynthesis.Substring;
 
-@complete feature double Score = WebSynthesis.Substring.RankingScore,
-								 WebSynthesis.Substring.LikelihoodScore,
-								 WebSynthesis.Substring.ReadabilityScore;
+@complete feature double Score = WebSynthesis.Substring.RankingScore;
 
 @input string v;
 
@@ -15,7 +16,7 @@ string str := TakeFirst(subStrs) | JoinList(subStrs, c) | v
 
 IReadOnlyList<string> subStrs := Concat(subStrs, select) | select
 							
-IReadOnlyList<string> select := SelectK(split, k)
+IReadOnlyList<string> select := SelectK(split, k) 
 							  | SelectRegex(split, r)
 
 IReadOnlyList<string> split := Split(v, c)

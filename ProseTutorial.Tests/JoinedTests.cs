@@ -44,7 +44,7 @@ namespace WebSynthesis.Joined
         }
 
         [TestMethod]
-        public void TestPrefix()
+        public void TestBasic()
         {
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/chjung.html", "Changhee Jung");
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/bgstm.html", "Tony Bergstrom");
