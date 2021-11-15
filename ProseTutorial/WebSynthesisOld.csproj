@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Joined.Language.Grammar.g.cs" />
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Joined.Language.TrainedFeatures.g.cs" />
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Joined.Language.Utilities.g.cs" />
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Substring.Language.Grammar.g.cs" />
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Substring.Language.TrainedFeatures.g.cs" />
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.Substring.Language.Utilities.g.cs" />
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.TreeManipulation.Language.Grammar.g.cs" />
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.TreeManipulation.Language.TrainedFeatures.g.cs" />
+    <Compile Include="obj\Debug\netcoreapp2.1\WebSynthesis.TreeManipulation.Language.Utilities.g.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
+    <PackageReference Include="Microsoft.ProgramSynthesis" Version="8.3.0" />
+    <PackageReference Include="Microsoft.ProgramSynthesis.Compiler" Version="8.3.0" />
+    <PackageReference Include="Microsoft.ProgramSynthesis.DslcTargets" Version="8.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <DotNetCliToolReference Include="Microsoft.ProgramSynthesis.Dslc" Version="8.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ContentWithTargetPath Include="WebSynthesis.Substring\WebSynthesis.Substring.grammar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>WebSynthesis.Substring.grammar</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="WebSynthesis.Substring\WebSynthesis.Substring.grammar" />
+    <ContentWithTargetPath Include="WebSynthesis.TreeManipulation\WebSynthesis.TreeManipulation.grammar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>WebSynthesis.TreeManipulation.grammar</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="WebSynthesis.TreeManipulation\WebSynthesis.TreeManipulation.grammar" />
+    <ContentWithTargetPath Include="WebSynthesis.Joined\WebSynthesis.Joined.grammar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>WebSynthesis.Joined.grammar</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="WebSynthesis.Joined\WebSynthesis.Joined.grammar" />
+  </ItemGroup>
+</Project>

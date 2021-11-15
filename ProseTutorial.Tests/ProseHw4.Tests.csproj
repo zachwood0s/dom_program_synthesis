@@ -6,12 +6,17 @@
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170628-02" />
-    <PackageReference Include="Microsoft.ProgramSynthesis" Version="8.2.0" />
-    <PackageReference Include="Microsoft.ProgramSynthesis.Compiler" Version="8.2.0" />
+    <PackageReference Include="Microsoft.ProgramSynthesis" Version="8.3.0" />
+    <PackageReference Include="Microsoft.ProgramSynthesis.Compiler" Version="8.3.0" />
+    <PackageReference Include="Microsoft.ProgramSynthesis.DslcTargets" Version="8.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
+    <DotNetCliToolReference Include="Microsoft.ProgramSynthesis.Dslc" Version="8.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProseTutorial\ProseHw4.csproj" />
+    <ProjectReference Include="..\ProseTutorial\WebSynthesis.csproj" />
   </ItemGroup>
 </Project>

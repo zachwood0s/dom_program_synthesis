@@ -17,12 +17,12 @@ using Microsoft.ProgramSynthesis.Wrangling.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.Utils;
 
-namespace TreeManipulation
+namespace WebSynthesis.TreeManipulation
 {
     [TestClass]
     public class RelationalPropertyTests
     {
-        private const string _GrammarPath = @"../../../../ProseTutorial/tree_synthesis/grammar/treemanim.grammar";
+        private const string _GrammarPath = @"../../../../ProseTutorial/TreeManipulation/grammar/treemanim.grammar";
         private static HtmlSequenceTestObject testObject;
 
         private static StructNode TN(string label)

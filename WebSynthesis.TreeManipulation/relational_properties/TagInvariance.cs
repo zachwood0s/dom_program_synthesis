@@ -1,9 +1,9 @@
-﻿using RelationalProperties;
+﻿using WebSynthesis.RelationalProperties;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace TreeManipulation.RelationalProperties
+namespace WebSynthesis.TreeManipulation.RelationalProperties
 {
 
     [RelationalProperty("Tag Invariant", typeof(ProseHtmlNode))]

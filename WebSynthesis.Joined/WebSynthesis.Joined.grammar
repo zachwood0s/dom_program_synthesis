@@ -1,7 +1,7 @@
 ﻿using Microsoft.ProgramSynthesis.DslLibrary;
 using Microsoft.ProgramSynthesis.Utils;
 using Microsoft.ProgramSynthesis.Grammar;
-using TreeManipulation;
+using WebSynthesis.TreeManipulation;
 
 using semantics WebSynthesis.Joined.Semantics;
 using learners WebSynthesis.Joined.WitnessFunctions;
@@ -10,7 +10,7 @@ using grammar Tree=WebSynthesis.TreeManipulation.Language.Grammar;
 
 language JoinedSynthesis;
 
-@complete feature double Score = JoinedSynthesis.RankingScore;
+@complete feature double Score = WebSynthesis.Joined.RankingScore;
 
 @input ProseHtmlNode inTree;
 

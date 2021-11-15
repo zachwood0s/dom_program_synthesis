@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,12 +25,26 @@ namespace WebSynthesis.Joined
         [ClassInitialize]
         public static void Init(TestContext _)
         {
-            testObject = new WebscrapeTestObject(_GrammarPath);
+            // Load substring
+            var substringGrammar = Utils.LoadGrammar("WebSynthesis.Substring.grammar", 
+                CompilerReference.FromAssemblyFiles(typeof(Substring.Semantics).GetTypeInfo().Assembly));
+
+
+            var treeGrammar = Utils.LoadGrammar("WebSynthesis.TreeManipulation.grammar",
+                CompilerReference.FromAssemblyFiles(typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly));
+
+            var joinedGrammar = Utils.LoadGrammar("WebSynthesis.Joined.grammar",
+                CompilerReference.FromAssemblyFiles(typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly,
+                                                    typeof(Substring.Semantics).GetTypeInfo().Assembly));
+
+            testObject = new WebscrapeTestObject("WebSynthesis.Joined.grammar");
 
             testObject.Init(
                 g => new RankingScore(g),
                 g => new WitnessFunctions(g),
-                typeof(Semantics).GetTypeInfo().Assembly
+                typeof(Semantics).GetTypeInfo().Assembly,
+                typeof(WebSynthesis.Substring.Semantics).GetTypeInfo().Assembly,
+                typeof(WebSynthesis.TreeManipulation.Semantics).GetTypeInfo().Assembly
                 );
         }
 
@@ -46,5 +61,6 @@ namespace WebSynthesis.Joined
 
             testObject.RunTest();
         }
+
     }
 }

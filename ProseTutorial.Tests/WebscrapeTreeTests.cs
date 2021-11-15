@@ -12,7 +12,7 @@ namespace WebSynthesis.TreeManipulation
     [TestClass]
     public class WebscrapeTreeTests
     {
-        private const string _GrammarPath = @"../../../../ProseTutorial/tree_synthesis/grammar/treemanim.grammar";
+        private const string _GrammarPath = @"../../../../ProseTutorial/TreeManipulation/grammar/treemanim.grammar";
         private static WebscrapeTestObject testObject;
 
         [ClassInitialize]

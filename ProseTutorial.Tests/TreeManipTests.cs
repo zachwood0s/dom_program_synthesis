@@ -22,7 +22,7 @@ namespace WebSynthesis.TreeManipulation
     [TestClass]
     public class TreeManipTest
     {
-        private const string _GrammarPath = @"../../../../ProseTutorial/tree_synthesis/grammar/treemanim.grammar";
+        private const string _GrammarPath = @"../../../../ProseTutorial/TreeManipulation/grammar/treemanim.grammar";
         private static HtmlSequenceTestObject testObject;
 
         private static StructNode TN(string label)
@@ -114,11 +114,11 @@ namespace WebSynthesis.TreeManipulation
                 Html("<child3/>"));
 
 
-            testObject.CreateTestCase(
-                Html("<parent><child1><child3/></child1><child2/></parent>"),
+            testObject.CreateExample(
+                Html("<parent><yep><child3/></yep><child2/></parent>"),
 
                 // Expected results
-                Html("<child1><child3/></child1>"),
+                Html("<yep><child3/></yep>"),
                 Html("<child3/>"),
                 Html("<child2/>")); 
 
