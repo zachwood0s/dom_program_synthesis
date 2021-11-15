@@ -9,6 +9,7 @@ namespace WebSynthesis.RelationalProperties
     public interface IRelationalProperty
     {
         IEnumerable<Tuple<object, object>> ApplyProperty(object input, object output);
+        string Name { get; }
     }
 
     [System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
@@ -131,9 +132,14 @@ namespace WebSynthesis.RelationalProperties
 
                 rSat = newRSat;
             }
+            var found = Rank(rSat);
+            Console.WriteLine("Using Properties:");
+            foreach(var prop in found)
+            {
+                Console.WriteLine(prop.Name);
+            }
 
-
-            return base.GetProgramSet(examples, Rank(rSat));
+            return base.GetProgramSet(examples, found);
         }
 
         private HashSet<IRelationalProperty> Rank(HashSet<HashSet<IRelationalProperty>> properties)

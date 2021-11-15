@@ -34,14 +34,14 @@ namespace Tests.Utils
         private SynthesisEngine _prose;
         private IFeature _score;
 
-        private ApplicationStrategy _strategy;
+        private RelationalApplicationStrategy _strategy;
 
         public TestObject(string grammar)
         {
             Examples = new List<Tuple<TIn, TOut>>();
             TestCases = new List<Tuple<TIn, TOut>>();
             _GrammarPath = grammar;
-            _strategy = new ApplicationStrategy(grammar);
+            _strategy = new RelationalApplicationStrategy(grammar);
         }
 
 

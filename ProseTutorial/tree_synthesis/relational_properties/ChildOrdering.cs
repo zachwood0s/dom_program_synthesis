@@ -9,6 +9,7 @@ namespace WebSynthesis.TreeManipulation.RelationalProperties
     [RelationalProperty("Child Order Invariant", typeof(ProseHtmlNode))]
     public class ChildOrderingInvariance : IRelationalProperty
     {
+        public string Name => "Child Order Invariant";
         private const int MaxReorderCount = 10;
         public IEnumerable<Tuple<object, object>> ApplyProperty(object input, object output)
         {
@@ -21,6 +22,5 @@ namespace WebSynthesis.TreeManipulation.RelationalProperties
                 yield return Tuple.Create<object, object>(newTree, output);
             }
         }
-
     }
 }

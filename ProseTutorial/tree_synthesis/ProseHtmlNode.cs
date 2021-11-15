@@ -70,7 +70,18 @@ namespace WebSynthesis.TreeManipulation
         public IReadOnlyList<ProseHtmlNode> ChildNodes => _childNodes;
         public IEnumerable<ProseAttribute> Attributes => _attributes.Values;
 
-        public string Name => _name;
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+
+            internal set
+            {
+                _name = value;
+            }
+        }
         public HtmlNodeType Type => _type;
         public string Text => _text;
 
