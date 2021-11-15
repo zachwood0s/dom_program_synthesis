@@ -8,7 +8,7 @@ namespace WebSynthesis.Substring
         public static string Get()
         {
             var assembly = typeof(GrammarText).GetTypeInfo().Assembly;
-            using (var stream = assembly.GetManifestResourceStream("SubstringSynthesis.substring.grammar"))
+            using (var stream = assembly.GetManifestResourceStream("WebSynthesis.Substring.WebSynthesis.Substring.grammar"))
             using (var reader = new StreamReader(stream))
             {
                 return reader.ReadToEnd();
