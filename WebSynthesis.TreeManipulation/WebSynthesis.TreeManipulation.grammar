@@ -25,7 +25,7 @@ IReadOnlyList<ProseHtmlNode> nodes
 	 | DescendantsWithAttr(subTree, attr) // Needed because disjunctive filter doesn't work
 
 ProseHtmlNode subTree 
-	:= SelectChild(rule, k) = Kth(rule, k)
+	:= SelectChild(@recurse[3] rule, k) = Kth(rule, k)
 	 | tree
 
 string tag;

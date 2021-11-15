@@ -34,7 +34,7 @@ namespace Tests.Utils
         private SynthesisEngine _prose;
         private IFeature _score;
 
-        private RelationalApplicationStrategy _strategy;
+        private ApplicationStrategy _strategy;
 
         public TestObject(string grammar)
         {
@@ -210,6 +210,41 @@ namespace Tests.Utils
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             return ProseHtmlNode.DeserializeFromHtmlNode(doc.DocumentNode.FirstChild);
+        }
+
+        private ProseHtmlNode ParseFromURL(string url)
+        {
+            var web = new HtmlWeb();
+            var doc = web.Load(url);
+            doc.OptionOutputAsXml = true;
+            var root = doc.DocumentNode;
+
+            return ProseHtmlNode.DeserializeFromHtmlNode(root.SelectSingleNode("html"));
+        }
+    }
+    class JoinedWebscrapeTestObject : SequenceTestObject<ProseHtmlNode, string>
+    {
+
+        public JoinedWebscrapeTestObject(string grammar)
+            : base(grammar) { }
+
+        public void CreateExample(string url, params string[] outs)
+        {
+            var node = ParseFromURL(url);
+            CreateExample(node, outs);
+        }
+
+        public void CreateTestCase(string url, params string[] outs)
+        {
+            var node = ParseFromURL(url);
+            CreateTestCase(node, outs);
+        }
+
+        protected override void AssertTruth(IEnumerable<string> expected, object actual)
+        {
+            Console.WriteLine($"Expected: {string.Join(',', expected.ToArray())}");
+            Console.WriteLine($"Actual: {string.Join(',', (actual as IEnumerable<object>).ToArray())}");
+            Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
         }
 
         private ProseHtmlNode ParseFromURL(string url)

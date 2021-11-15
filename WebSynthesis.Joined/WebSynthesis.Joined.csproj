@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WebSynthesis.Substring.Semantics\WebSynthesis.Substring.Semantics.csproj" />
     <ProjectReference Include="..\WebSynthesis.TreeManipulation.Semantics\WebSynthesis.TreeManipulation.Semantics.csproj" />
     <ProjectReference Include="..\WebSynthesis.TreeManipulation\WebSynthesis.TreeManipulation.csproj" />
   </ItemGroup>

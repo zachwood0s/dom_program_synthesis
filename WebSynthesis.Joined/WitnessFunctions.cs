@@ -7,6 +7,7 @@ using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Rules;
 using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.Utils;
+using WebSynthesis.TreeManipulation;
 
 namespace WebSynthesis.Joined
 {
@@ -15,5 +16,85 @@ namespace WebSynthesis.Joined
         public WitnessFunctions(Grammar grammar) : base(grammar)
         {
         }
+        [WitnessFunction("JoinMap", 1)]
+        public DisjunctiveExamplesSpec WitnessLinesMap(GrammarRule rule, ExampleSpec spec)
+        {
+            var linesExamples = new Dictionary<State, IEnumerable<object>>();
+            foreach (State input in spec.ProvidedInputs)
+            {
+                var possibleTextsContaining = new List<List<string>>();
+                var tree = input[rule.Grammar.InputSymbol] as ProseHtmlNode;
+                var selections = spec.Examples[input] as IEnumerable<string>;
+
+                var allNodes = new[] { tree }.RecursiveSelect(x => x.ChildNodes);
+                foreach (string example in selections)
+                {
+                    foreach (var n in allNodes)
+                    {
+                        if (n.Text != null && n.Text.Contains(example))
+                        {
+                            possibleTextsContaining.Add(new List<string>(){n.Text});
+                        }
+                    }
+                }
+                /*
+                var selectionPrefix = spec.PositiveExamples[input].Cast<StringRegion>();
+
+                foreach (StringRegion example in selectionPrefix)
+                {
+                    var startLine = GetLine(document, example.Start);
+                    var endLine = GetLine(document, example.End);
+                    if (startLine == null || endLine == null || startLine != endLine)
+                        return null;
+                    linesContainingSelection.Add(startLine);
+                }
+                */
+
+                linesExamples[input] = possibleTextsContaining;
+            }
+            return new DisjunctiveExamplesSpec(linesExamples);
+        }
+
+        [WitnessFunction(nameof(Semantics.NodesToStrs), 0)]
+        public DisjunctiveExamplesSpec WitnessNodesToStrs(GrammarRule rule, DisjunctiveExamplesSpec spec)
+        {
+            var result = new Dictionary<State, IEnumerable<object>>();
+            foreach (KeyValuePair<State, IEnumerable<object>> example in spec.DisjunctiveExamples)
+            {
+                State inputState = example.Key;
+                var tree = inputState[rule.Grammar.InputSymbol] as ProseHtmlNode;
+                var possibilites = new List<List<ProseHtmlNode>>();
+
+                var allNodes = new[] { tree }.RecursiveSelect(x => x.ChildNodes).ToList();
+                foreach(IEnumerable<string> strings in example.Value)
+                {
+                    var nodeList = new List<ProseHtmlNode>();
+                    foreach(var str in strings)
+                    {
+                        var found = allNodes.Where(x => x.Text == str).FirstOrDefault();
+                        if (found == null)
+                            return null;
+
+                        nodeList.Add(found);
+                    }
+
+                    possibilites.Add(nodeList);
+                }
+
+                result[inputState] = possibilites.Distinct().ToList();
+            }
+
+            return new DisjunctiveExamplesSpec(result);
+        }
+
+        [ExternLearningLogicMapping("StringSelection")]
+        public DomainLearningLogic ExternWitnessFunctionString()
+        {
+            return new Substring.WitnessFunctions(Grammar.GrammarReferences["Substring"]);
+        }
+
+        [ExternLearningLogicMapping("NodeSelection")]
+        public DomainLearningLogic ExternWitnessFunctionNode
+            => new TreeManipulation.WitnessFunctions(Grammar.GrammarReferences["Tree"]);
     }
 }

@@ -14,7 +14,7 @@ language JoinedSynthesis;
 
 @input ProseHtmlNode inTree;
 
-@start IReadOnlyList<string> program := strs
+@start IReadOnlyList<ProseHtmlNode> program := strs
 
 IReadOnlyList<string> strs := JoinMap(substring, nodeStrs) = Map(\str: string => substring, nodeStrs);
 string substring := @id['StringSelection'] @subst[v := str] Substring.program;

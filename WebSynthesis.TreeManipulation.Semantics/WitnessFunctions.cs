@@ -247,6 +247,13 @@ namespace WebSynthesis.TreeManipulation
 
         #region Descendants With Tag
 
+        private CachedCalculation<Tuple<ProseHtmlNode, string>, List<Tuple<ProseHtmlNode, List<ProseHtmlNode>>>> descendentsByTag
+            = new CachedCalculation<Tuple<ProseHtmlNode, string>, List<Tuple<ProseHtmlNode, List<ProseHtmlNode>>>>(
+                input => new[] { input.Item1 }.RecursiveSelect(x => x.ChildNodes)
+                         .Select(x => Tuple.Create(x, Semantics.Descendants(x).Where(i => i.Name == input.Item2).ToList()))
+                         .ToList()
+            );
+
         [WitnessFunction(nameof(Semantics.DescendantsWithTag), 0, DependsOnParameters = new[] { 1 })]
         public DisjunctiveExamplesSpec WitnessDescendantsWithTagSubseq(GrammarRule rule, DisjunctiveSubsequenceSpec spec, ExampleSpec tagSpec)
         {
@@ -262,9 +269,10 @@ namespace WebSynthesis.TreeManipulation
                 var occList = new List<ProseHtmlNode>();
                 foreach (IEnumerable<object> output in example.Value)
                 {
-                    var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
-                                      where Semantics.Descendants(i).Where(x => x.Name == tag).ContainsSubsequence(output)
-                                      select i;
+                    var descendents = descendentsByTag.GetValue(Tuple.Create(input[0], tag));
+                    var occurrences = from i in descendents
+                                      where i.Item2.ContainsSubsequence(output)
+                                      select i.Item1;
 
                     occList.AddRange(occurrences);
                 }

@@ -17,6 +17,12 @@ namespace WebSynthesis.Joined
             return substring + nodes;
         }
 
+        [ExternFeatureMapping("NodeSelection", 0)]
+        public IFeature ExternTreeScore => new TreeManipulation.RankingScore(Grammar.GrammarReferences["Tree"]);
+
+        [ExternFeatureMapping("StringSelection", 0)]
+        public IFeature ExternSubstringScore => new Substring.RankingScore(Grammar.GrammarReferences["Substring"]);
+
         [FeatureCalculator(nameof(Semantics.NodesToStrs))]
         public static double NodesToStrs(double nodes)
         {

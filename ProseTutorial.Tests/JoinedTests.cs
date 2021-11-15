@@ -19,35 +19,21 @@ namespace WebSynthesis.Joined
     [TestClass]
     public class JoinedTests
     {
-        private const string _GrammarPath = @"../../../../ProseTutorial/joined_synthesis/grammar/joined.grammar";
-        private static WebscrapeTestObject testObject;
+        private static JoinedWebscrapeTestObject testObject;
 
         [ClassInitialize]
         public static void Init(TestContext _)
         {
-            // Load substring
-            var substringGrammar = Utils.LoadGrammar("WebSynthesis.Substring.grammar", 
-                CompilerReference.FromAssemblyFiles(typeof(Substring.Semantics).GetTypeInfo().Assembly));
-
-
-            var treeGrammar = Utils.LoadGrammar("WebSynthesis.TreeManipulation.grammar",
-                CompilerReference.FromAssemblyFiles(typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly));
-
-            var joinedGrammar = Utils.LoadGrammar("WebSynthesis.Joined.grammar",
-                CompilerReference.FromAssemblyFiles(typeof(Joined.Semantics).GetTypeInfo().Assembly,
-                                                    typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly,
-                                                    typeof(Substring.Semantics).GetTypeInfo().Assembly,
-                                                    typeof(TreeManipulation.Language).GetTypeInfo().Assembly,
-                                                    typeof(Substring.Language).GetTypeInfo().Assembly));
-
-            testObject = new WebscrapeTestObject("WebSynthesis.Joined.grammar");
+            testObject = new JoinedWebscrapeTestObject("WebSynthesis.Joined.grammar");
 
             testObject.Init(
-                g => new RankingScore(g),
-                g => new WitnessFunctions(g),
-                typeof(Semantics).GetTypeInfo().Assembly,
-                typeof(WebSynthesis.Substring.Semantics).GetTypeInfo().Assembly,
-                typeof(WebSynthesis.TreeManipulation.Semantics).GetTypeInfo().Assembly
+                g => new Joined.RankingScore(g),
+                g => new Joined.WitnessFunctions(g),
+                typeof(Joined.Semantics).GetTypeInfo().Assembly,
+                typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly,
+                typeof(Substring.Semantics).GetTypeInfo().Assembly,
+                typeof(TreeManipulation.Language).GetTypeInfo().Assembly,
+                typeof(Substring.Language).GetTypeInfo().Assembly
                 );
         }
 
@@ -61,6 +47,11 @@ namespace WebSynthesis.Joined
         public void TestPrefix()
         {
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/chjung.html", "Changhee Jung");
+            testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/bgstm.html", "Tony Bergstrom");
+            /*
+            testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/chjung.html", "Changhee Jung", "Associate Professor in Computer Science");
+            testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/bgstm.html", "Tony Bergstrom", "Assistant Professor of Practice");
+            */
 
             testObject.RunTest();
         }

@@ -108,6 +108,7 @@ namespace WebSynthesis.RelationalProperties
                 // Kill the worker if the timebound has been exceeded
                 ts.Cancel();
                 Console.WriteLine("Canceled");
+                _log.SaveLogToXML("synthesis_log.xml");
             }
             return output;
         }
