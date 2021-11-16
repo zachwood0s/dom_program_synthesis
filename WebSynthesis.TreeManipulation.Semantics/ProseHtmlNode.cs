@@ -83,7 +83,18 @@ namespace WebSynthesis.TreeManipulation
             }
         }
         public HtmlNodeType Type => _type;
-        public string Text => _text;
+        public string Text
+        {
+            get
+            {
+                return _text;
+            }
+            
+            set
+            {
+                _text = value;
+            }
+        }
 
 
         public IEnumerable<ProseHtmlNode> Descendants

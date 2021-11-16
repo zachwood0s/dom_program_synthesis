@@ -46,8 +46,9 @@ namespace WebSynthesis.Substring
                 {
                     if (output.Count > 1)
                     {
-                        string i = string.Join((char)c, output);
-                        strs.Add(i);
+                        string i = string.Join(c, output);
+                        if (input.Contains(i))
+                            strs.Add(i);
                     }
                 }
 

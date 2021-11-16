@@ -18,7 +18,7 @@ IReadOnlyList<string> subStrs := Concat(subStrs, select) | select
 IReadOnlyList<string> select := SelectK(split, k)
 							  | SelectRegex(split, r)
 
-IReadOnlyList<string> split := Split(v, c)
+IReadOnlyList<string> split := Split(str, c)
 
 int k;
 char c;

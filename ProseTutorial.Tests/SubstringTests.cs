@@ -120,12 +120,10 @@ namespace WebSynthesis.Substring
         }
 
         [TestMethod]
-        public void TestPrefix()
+        public void TestLastNameInEmail()
         {
-            testObject.CreateExample("asdfa fda Dr. Smith asdfa", "Dr. Smith");
-            testObject.CreateExample("1;sdf Dr. jeff", "Dr. jeff");
-
-            testObject.CreateTestCase(" Dr. bob ", "Dr. bob");
+            testObject.CreateExample("Nancy.FreeHafer@fourthcoffee.com", "FreeHafer");
+            testObject.CreateExample("Nancy.FreeHafer@fourthcoffee.com", "FreeHafer");
 
             testObject.RunTest();
         }

@@ -9,5 +9,9 @@
     <PackageReference Include="Microsoft.ProgramSynthesis.Common" Version="8.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WebSynthesis.TreeManipulation.Semantics\WebSynthesis.TreeManipulation.Semantics.csproj" />
+  </ItemGroup>
+
 
 </Project>
