@@ -7,9 +7,11 @@ using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.AST;
 using Microsoft.ProgramSynthesis.Compiler;
 using Microsoft.ProgramSynthesis.Diagnostics;
+using Microsoft.ProgramSynthesis.DslLibrary;
 using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Learning.Strategies;
 using Microsoft.ProgramSynthesis.Specifications;
+using Microsoft.ProgramSynthesis.Utils;
 using Microsoft.ProgramSynthesis.VersionSpace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.Utils;
@@ -33,7 +35,9 @@ namespace WebSynthesis.Joined
                 typeof(TreeManipulation.Semantics).GetTypeInfo().Assembly,
                 typeof(Substring.Semantics).GetTypeInfo().Assembly,
                 typeof(TreeManipulation.Language).GetTypeInfo().Assembly,
-                typeof(Substring.Language).GetTypeInfo().Assembly
+                typeof(Substring.Language).GetTypeInfo().Assembly,
+                typeof(StringRegion).GetTypeInfo().Assembly,
+                typeof(Record).GetTypeInfo().Assembly
                 );
         }
 

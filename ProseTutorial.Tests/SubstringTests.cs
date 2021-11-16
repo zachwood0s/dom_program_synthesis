@@ -6,9 +6,11 @@ using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.AST;
 using Microsoft.ProgramSynthesis.Compiler;
 using Microsoft.ProgramSynthesis.Diagnostics;
+using Microsoft.ProgramSynthesis.DslLibrary;
 using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Learning.Strategies;
 using Microsoft.ProgramSynthesis.Specifications;
+using Microsoft.ProgramSynthesis.Utils;
 using Microsoft.ProgramSynthesis.VersionSpace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.Utils;
@@ -29,7 +31,9 @@ namespace WebSynthesis.Substring
             testObject.Init(
                 g => new RankingScore(g),
                 g => new WitnessFunctions(g),
-                typeof(Semantics).GetTypeInfo().Assembly
+                typeof(Semantics).GetTypeInfo().Assembly,
+                typeof(StringRegion).GetTypeInfo().Assembly,
+                typeof(Record).GetTypeInfo().Assembly
                 );
         }
 
@@ -123,7 +127,7 @@ namespace WebSynthesis.Substring
         public void TestLastNameInEmail()
         {
             testObject.CreateExample("Nancy.FreeHafer@fourthcoffee.com", "FreeHafer");
-            testObject.CreateExample("Nancy.FreeHafer@fourthcoffee.com", "FreeHafer");
+            //testObject.CreateExample("Nancy.FreeHafer@fourthcoffee.com", "FreeHafer");
 
             testObject.RunTest();
         }

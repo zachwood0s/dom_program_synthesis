@@ -1,4 +1,8 @@
-﻿using semantics WebSynthesis.Substring.Semantics;
+﻿﻿using System.Text.RegularExpressions;
+using Microsoft.ProgramSynthesis.DslLibrary;
+using Microsoft.ProgramSynthesis.Utils;
+
+using semantics WebSynthesis.Substring.Semantics;
 using learners WebSynthesis.Substring.WitnessFunctions;
 
 language WebSynthesis.Substring;
@@ -9,17 +13,25 @@ language WebSynthesis.Substring;
 
 @input string v;
 
-@start string program := str
+@start string program := subList | subStr
 
-string str := TakeFirst(subStrs) | JoinList(subStrs, c) | v
-
-IReadOnlyList<string> subStrs := Concat(subStrs, select) | select
-							
+string subList := TakeFirst(listStrs) 
+			    | JoinList(listStrs, c)
+IReadOnlyList<string> listStrs := Concat(listStrs, select) | select					
 IReadOnlyList<string> select := SelectK(split, k)
 							  | SelectRegex(split, r)
+IReadOnlyList<string> split := Split(v, c)
 
-IReadOnlyList<string> split := Split(str, c)
+string subStr := ToString(subStrRegion) | v
+StringRegion subStrRegion := Substr(strRegion, posPair);
+
+Record<uint?, uint?>? posPair := PosPair(pos, pos) = Pair(pos, pos);
+uint? pos := AbsPos(strRegion, k) | RegPos(strRegion, rr, k);
+Record<RegularExpression, RegularExpression>? rr := BoundaryPair(re, re) = Pair(re, re);
+
+StringRegion strRegion := ToStringRegion(v)
 
 int k;
 char c;
+RegularExpression re;
 Regex r;

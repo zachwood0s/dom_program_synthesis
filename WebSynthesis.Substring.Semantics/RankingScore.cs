@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.AST;
+using Microsoft.ProgramSynthesis.DslLibrary;
 using Microsoft.ProgramSynthesis.Features;
 
 namespace WebSynthesis.Substring
@@ -30,16 +31,38 @@ namespace WebSynthesis.Substring
         [FeatureCalculator(nameof(Semantics.JoinList))]
         public static double JoinList(double list, double c) => LikelihoodScore.JoinList(list, c) + ReadabilityScore.JoinList(list, c);
 
+        [FeatureCalculator(nameof(Semantics.Substr))]
+        public static double SubStr(double x, double pp) => LikelihoodScore.SubStr(x, pp) + ReadabilityScore.SubStr(x, pp);
+
+        [FeatureCalculator(nameof(Semantics.ToString))]
+        public static double ToString(double reg) => LikelihoodScore.ToString(reg) + ReadabilityScore.ToString(reg);
+
+        [FeatureCalculator(nameof(Semantics.ToStringRegion))]
+        public static double ToStringRegion(double str) => LikelihoodScore.ToStringRegion(str) + ReadabilityScore.ToStringRegion(str);
+
+        [FeatureCalculator("PosPair")]
+        public static double PosPair(double pp1, double pp2) => LikelihoodScore.PosPair(pp1, pp2) + ReadabilityScore.PosPair(pp1, pp2);
+
+        [FeatureCalculator(nameof(Semantics.AbsPos))]
+        public static double AbsPos(double x, double k) => LikelihoodScore.AbsPos(x, k) + ReadabilityScore.AbsPos(x, k);
+
+        [FeatureCalculator(nameof(Semantics.RegPos))]
+        public static double RegPos(double x, double rr, double k) => LikelihoodScore.RegPos(x, rr, k) + ReadabilityScore.RegPos(x, rr, k);
+
+        [FeatureCalculator("BoundaryPair")]
+        public static double BoundaryPair(double r1, double r2) => LikelihoodScore.BoundaryPair(r1, r2) + ReadabilityScore.BoundaryPair(r1, r2);
+
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
         public static double K(int k) => LikelihoodScore.K(k) + ReadabilityScore.K(k);
-
 
         [FeatureCalculator("c", Method = CalculationMethod.FromLiteral)]
         public static double C(char c) => LikelihoodScore.C(c) + ReadabilityScore.C(c);
 
-
         [FeatureCalculator("r", Method = CalculationMethod.FromLiteral)]
         public static double R(Regex r) => LikelihoodScore.R(r) + ReadabilityScore.R(r);
+
+        [FeatureCalculator("re", Method = CalculationMethod.FromLiteral)]
+        public static double RE(RegularExpression r) => LikelihoodScore.RE(r) + ReadabilityScore.RE(r);
     }
 
     public class LikelihoodScore : Feature<double>
@@ -73,6 +96,27 @@ namespace WebSynthesis.Substring
         [FeatureCalculator(nameof(Semantics.JoinList))]
         public static double JoinList(double list, double c) => list + c + discourage;
 
+        [FeatureCalculator(nameof(Semantics.Substr))]
+        public static double SubStr(double x, double pp) => x + pp + discourage;
+
+        [FeatureCalculator(nameof(Semantics.ToString))]
+        public static double ToString(double reg) => reg;
+
+        [FeatureCalculator(nameof(Semantics.ToStringRegion))]
+        public static double ToStringRegion(double str) => str;
+
+        [FeatureCalculator("PosPair")]
+        public static double PosPair(double pp1, double pp2) => pp1 * pp2;
+
+        [FeatureCalculator(nameof(Semantics.AbsPos))]
+        public static double AbsPos(double x, double k) => x * k;
+
+        [FeatureCalculator(nameof(Semantics.RegPos))]
+        public static double RegPos(double x, double rr, double k) => rr * k;
+
+        [FeatureCalculator("BoundaryPair")]
+        public static double BoundaryPair(double r1, double r2) => r1 + r2;
+
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
         public static double K(int k) => k != 0 ? 1 / k : 0;
 
@@ -81,6 +125,9 @@ namespace WebSynthesis.Substring
 
         [FeatureCalculator("r", Method = CalculationMethod.FromLiteral)]
         public static double R(Regex r) => 1;
+
+        [FeatureCalculator("re", Method = CalculationMethod.FromLiteral)]
+        public static double RE(RegularExpression r) => 1;
 
     }
 
@@ -112,6 +159,27 @@ namespace WebSynthesis.Substring
         [FeatureCalculator(nameof(Semantics.JoinList))]
         public static double JoinList(double list, double c) => list + c + depthPenalty;
 
+        [FeatureCalculator(nameof(Semantics.Substr))]
+        public static double SubStr(double x, double pp) => x + pp + depthPenalty;
+
+        [FeatureCalculator(nameof(Semantics.ToString))]
+        public static double ToString(double reg) => reg + depthPenalty;
+
+        [FeatureCalculator(nameof(Semantics.ToStringRegion))]
+        public static double ToStringRegion(double str) => str + depthPenalty;
+
+        [FeatureCalculator("PosPair")]
+        public static double PosPair(double pp1, double pp2) => pp1 * pp2 + depthPenalty;
+
+        [FeatureCalculator(nameof(Semantics.AbsPos))]
+        public static double AbsPos(double x, double k) => k + depthPenalty;
+
+        [FeatureCalculator(nameof(Semantics.RegPos))]
+        public static double RegPos(double x, double rr, double k) => rr * k + depthPenalty;
+
+        [FeatureCalculator("BoundaryPair")]
+        public static double BoundaryPair(double r1, double r2) => r1 + r2 + depthPenalty;
+
         [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
         public static double K(int k) => 0;
 
@@ -120,6 +188,9 @@ namespace WebSynthesis.Substring
 
         [FeatureCalculator("r", Method = CalculationMethod.FromLiteral)]
         public static double R(Regex r) => 0;
+
+        [FeatureCalculator("re", Method = CalculationMethod.FromLiteral)]
+        public static double RE(RegularExpression r) => 0;
 
     }
 }
