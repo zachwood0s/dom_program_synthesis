@@ -50,12 +50,12 @@ namespace WebSynthesis.Joined
         [TestMethod]
         public void TestBasic()
         {
+            /*
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/chjung.html", "Changhee Jung");
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/bgstm.html", "Tony Bergstrom");
-            /*
+            */
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/chjung.html", "Changhee Jung", "Associate Professor in Computer Science");
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/bgstm.html", "Tony Bergstrom", "Assistant Professor of Practice");
-            */
 
             testObject.RunTest();
         }

@@ -22,21 +22,24 @@ namespace WebSynthesis.Joined
             var linesExamples = new Dictionary<State, IEnumerable<object>>();
             foreach (State input in spec.ProvidedInputs)
             {
-                var possibleTextsContaining = new List<List<string>>();
+                var possibleNodesForEachText = new List<List<string>>();
                 var tree = input[rule.Grammar.InputSymbol] as ProseHtmlNode;
                 var selections = spec.Examples[input] as IEnumerable<string>;
 
                 var allNodes = new[] { tree }.RecursiveSelect(x => x.ChildNodes);
                 foreach (string example in selections)
                 {
+                    var nodeTexts = new List<string>();
                     foreach (var n in allNodes)
                     {
                         if (n.Text != null && n.Text.Contains(example))
                         {
-                            possibleTextsContaining.Add(new List<string>(){n.Text});
+                            nodeTexts.Add(n.Text);
                         }
                     }
+                    possibleNodesForEachText.Add(nodeTexts);
                 }
+
                 /*
                 var selectionPrefix = spec.PositiveExamples[input].Cast<StringRegion>();
 
@@ -50,7 +53,8 @@ namespace WebSynthesis.Joined
                 }
                 */
 
-                linesExamples[input] = possibleTextsContaining;
+                var combos = GetAllPossibleCombos(possibleNodesForEachText);
+                linesExamples[input] = combos.Select(x => x.ToList()).ToList();
             }
             return new DisjunctiveExamplesSpec(linesExamples);
         }
@@ -96,5 +100,18 @@ namespace WebSynthesis.Joined
         [ExternLearningLogicMapping("NodeSelection")]
         public DomainLearningLogic ExternWitnessFunctionNode
             => new TreeManipulation.WitnessFunctions(Grammar.GrammarReferences["Tree"]);
+
+
+        private static IEnumerable<IEnumerable<T>> GetAllPossibleCombos<T>(IEnumerable<IEnumerable<T>> options)
+        {
+            IEnumerable<IEnumerable<T>> combos = new T[][] { new T[0] };
+            foreach(var inner in options)
+            {
+                combos = from c in combos
+                         from i in inner
+                         select c.Append(i);
+            }
+            return combos;
+        }
     }
 }

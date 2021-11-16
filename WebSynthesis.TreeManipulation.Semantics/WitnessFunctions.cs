@@ -59,7 +59,7 @@ namespace WebSynthesis.TreeManipulation
                     for (var i = 0; i < output.Count - 1; i++)
                     {
                         var temp = new List<ProseHtmlNode>();
-                        if (count == 0)
+                        if (i == 0)
                         {
                             temp.Add(output[i]);
                         }
@@ -99,9 +99,11 @@ namespace WebSynthesis.TreeManipulation
                 foreach(IReadOnlyList<ProseHtmlNode> concat1List in startSpec.DisjunctiveExamples[inputState])
                 {
                     var temp = (from output in example.Value
-                               from outNode in (IReadOnlyList<ProseHtmlNode>)output
-                               where concat1List.All(x => !x.Equals(outNode))
-                               select outNode).Distinct().ToList();
+                                let o = (IReadOnlyList<ProseHtmlNode>) output
+                                where o.ContainsSubsequence(concat1List)
+                                from outNode in (IReadOnlyList<ProseHtmlNode>)output
+                                where concat1List.All(x => !x.Equals(outNode))
+                                select outNode).Distinct().ToList();
 
                     possibilities.Add(temp.ToList());
 
