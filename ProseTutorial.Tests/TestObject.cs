@@ -34,7 +34,7 @@ namespace Tests.Utils
         private SynthesisEngine _prose;
         private IFeature _score;
 
-        private ApplicationStrategy _strategy;
+        private RelationalApplicationStrategy _strategy;
 
         public TestObject(string grammar)
         {

@@ -13,17 +13,17 @@ language WebSynthesis.Substring;
 
 @input string v;
 
-@start string program := subList | subStr
+@start string program := listString | subString
 
-string subList := TakeFirst(listStrs) 
-			    | JoinList(listStrs, c)
-IReadOnlyList<string> listStrs := Concat(listStrs, select) | select					
+string listString := TakeFirst(listStrings) 
+			    | JoinList(listStrings, c)
+IReadOnlyList<string> listStrings := Concat(listStrings, select) | select					
 IReadOnlyList<string> select := SelectK(split, k)
 							  | SelectRegex(split, r)
 IReadOnlyList<string> split := Split(v, c)
 
-string subStr := ToString(subStrRegion) | v
-StringRegion subStrRegion := Substr(strRegion, posPair);
+string subString := ToString(subStringRegion) | v
+StringRegion subStringRegion := Substr(strRegion, posPair);
 
 Record<uint?, uint?>? posPair := PosPair(pos, pos) = Pair(pos, pos);
 uint? pos := AbsPos(strRegion, k) | RegPos(strRegion, rr, k);
