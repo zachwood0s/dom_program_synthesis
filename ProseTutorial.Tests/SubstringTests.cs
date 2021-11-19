@@ -127,7 +127,10 @@ namespace WebSynthesis.Substring
         public void TestLastNameInEmail()
         {
             testObject.CreateExample("Nancy.FreeHafer@fourthcoffee.com", "FreeHafer");
-            //testObject.CreateExample("Nancy.FreeHafer@fourthcoffee.com", "FreeHafer");
+            testObject.CreateExample("Jan.Kotas@litwareinc.com", "Kotas");
+
+            testObject.CreateTestCase("Steven.Thorpe@northwindtraders.com", "Thorpe");
+            testObject.CreateTestCase("Mariya.Sergienko@gradicdesigninstitute.com", "Sergienko");
 
             testObject.RunTest();
         }

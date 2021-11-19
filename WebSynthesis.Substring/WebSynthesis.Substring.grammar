@@ -33,5 +33,5 @@ StringRegion strRegion := ToStringRegion(v)
 
 int k;
 char c;
-RegularExpression re;
 Regex r;
+RegularExpression re;

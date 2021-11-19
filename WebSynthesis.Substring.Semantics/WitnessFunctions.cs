@@ -19,14 +19,6 @@ namespace WebSynthesis.Substring
         {
         }
 
-        private static Regex[] regexes =
-        {
-            new Regex(@"[a-z]+"),
-            new Regex(@"[A-Z]+"),
-            new Regex(@"\d+"),
-            new Regex(@"\s+")
-        };
-
         #region Split
 
         //[WitnessFunction(nameof(Semantics.Split), 0, DependsOnParameters = new[] { 1 })]
@@ -490,7 +482,7 @@ namespace WebSynthesis.Substring
             {
                 var result = new List<Regex>();
 
-                foreach (Regex r in regexes)
+                foreach (Regex r in RegexUtils.Tokens)
                 {
                     bool isMatch = true;
                     foreach (string o in output)
