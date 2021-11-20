@@ -265,8 +265,8 @@ namespace WebSynthesis.TreeManipulation
                 _childNodes = _childNodes.Select(x => x.DeepCopy()).ToList(),
                 _type = _type,
                 _text = _text,
-                _line = _line,
-                _col = _col,
+                //_line = _line,
+                //_col = _col,
                 _parent = null
             };
             foreach(var c in newNode.ChildNodes)

@@ -42,6 +42,11 @@ namespace WebSynthesis.TreeManipulation
             return node.Descendants.Where(x => x[attr] != null).ToList();
         }
 
+        public static IReadOnlyList<ProseHtmlNode> DescendantsWithAttrValue(ProseHtmlNode node, string attr, string value)
+        {
+            return node.Descendants.Where(x => x[attr]?.Value == value).ToList();
+        }
+
         public static bool MatchTag(ProseHtmlNode n, string tag)
         {
             return n.Name.Equals(tag);

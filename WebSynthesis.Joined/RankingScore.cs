@@ -29,6 +29,12 @@ namespace WebSynthesis.Joined
             return nodes;
         }
 
+        [FeatureCalculator(nameof(Semantics.Concat))]
+        public static double NodesToStrs(double a, double b)
+        {
+            return a + b;
+        }
+
         [FeatureCalculator(nameof(Semantics.StrToTree))]
         public static double StrToTree(double url)
         {

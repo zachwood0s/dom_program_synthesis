@@ -50,12 +50,18 @@ namespace WebSynthesis.Joined
         [TestMethod]
         public void TestBasic()
         {
-            /*
-            testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/chjung.html", "Changhee Jung");
-            testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/bgstm.html", "Tony Bergstrom");
-            */
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/chjung.html", "Changhee Jung", "Associate Professor in Computer Science");
             testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/bgstm.html", "Tony Bergstrom", "Assistant Professor of Practice");
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestEducation()
+        {
+            testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/clifton.html", "Education", "PhD, Princeton University, Computer Science (1991)");
+            testObject.CreateExample("https://www.cs.purdue.edu/people/faculty/chjung.html", "Education", "PhD, Georgia Institute of Technology, Computer Science (2013)");
+            //testObject.CreateTestCase("https://www.cs.purdue.edu/people/faculty/bgstm.html", "PhD, University of Illinois at Urbana-Champaign, Computer Science (2011)");
 
             testObject.RunTest();
         }

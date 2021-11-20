@@ -19,6 +19,9 @@ namespace WebSynthesis.Joined
             return strs;
         }
 
+        public static IReadOnlyList<string> Concat(IReadOnlyList<string> a, IReadOnlyList<string> b)
+            => a.Concat(b).ToList();
+
         public static ProseHtmlNode StrToTree(string url)
         {
             return new ProseHtmlNode(url);

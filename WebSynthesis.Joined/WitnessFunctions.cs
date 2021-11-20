@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FuzzySharp;
 using Microsoft.ProgramSynthesis;
 using Microsoft.ProgramSynthesis.Learning;
 using Microsoft.ProgramSynthesis.Rules;
@@ -26,32 +27,21 @@ namespace WebSynthesis.Joined
                 var tree = input[rule.Grammar.InputSymbol] as ProseHtmlNode;
                 var selections = spec.Examples[input] as IEnumerable<string>;
 
-                var allNodes = new[] { tree }.RecursiveSelect(x => x.ChildNodes);
+                var allNodes = new[] { tree }.RecursiveSelect(x => x.ChildNodes)
+                                             .Where(x => x.Text != null)
+                                             .Select(x => x.Text)
+                                             .ToList();
                 foreach (string example in selections)
                 {
                     var nodeTexts = new List<string>();
-                    foreach (var n in allNodes)
+
+                    var best = Process.ExtractSorted(example, allNodes, cutoff: 95);
+                    foreach (var n in best)
                     {
-                        if (n.Text != null && n.Text.Contains(example))
-                        {
-                            nodeTexts.Add(n.Text);
-                        }
+                        nodeTexts.Add(n.Value);
                     }
                     possibleNodesForEachText.Add(nodeTexts);
                 }
-
-                /*
-                var selectionPrefix = spec.PositiveExamples[input].Cast<StringRegion>();
-
-                foreach (StringRegion example in selectionPrefix)
-                {
-                    var startLine = GetLine(document, example.Start);
-                    var endLine = GetLine(document, example.End);
-                    if (startLine == null || endLine == null || startLine != endLine)
-                        return null;
-                    linesContainingSelection.Add(startLine);
-                }
-                */
 
                 var combos = GetAllPossibleCombos(possibleNodesForEachText);
                 linesExamples[input] = combos.Select(x => x.ToList()).ToList();
@@ -84,6 +74,8 @@ namespace WebSynthesis.Joined
 
                     possibilites.Add(nodeList);
                 }
+                if (possibilites.Count == 0)
+                    return null;
 
                 result[inputState] = possibilites.Distinct().ToList();
             }
@@ -112,6 +104,43 @@ namespace WebSynthesis.Joined
                          select c.Append(i);
             }
             return combos;
+        }
+
+        private bool PossiblyContainsText(ProseHtmlNode node, string text)
+        {
+            const int threshold = 90;
+            if (node.Text == null)
+                return false;
+
+            // We'll want to improve this if we want to support joined text
+            var ratio = Fuzz.PartialRatio(text, node.Text);
+            //return node.Text.Contains(text);//lenRatio > threshold;
+            return ratio > threshold;
+        }
+
+
+        public static string GetLongestCommonSubstring(params string[] strings)
+        {
+            var commonSubstrings = new HashSet<string>(GetSubstrings(strings[0]));
+            foreach (string str in strings.Skip(1))
+            {
+                commonSubstrings.IntersectWith(GetSubstrings(str));
+                if (commonSubstrings.Count == 0)
+                    return string.Empty;
+            }
+
+            return commonSubstrings.OrderByDescending(s => s.Length).DefaultIfEmpty(string.Empty).First();
+        }
+
+        private static IEnumerable<string> GetSubstrings(string str)
+        {
+            for (int c = 0; c < str.Length - 1; c++)
+            {
+                for (int cc = 1; c + cc <= str.Length; cc++)
+                {
+                    yield return str.Substring(c, cc);
+                }
+            }
         }
     }
 }
