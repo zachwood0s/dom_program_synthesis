@@ -516,6 +516,7 @@ namespace WebSynthesis.Substring
 
                 int start = input.IndexOf(output[index]);
                 char? c = null;
+                if (start < 0) return c;
 
                 if (start - 1 > 0)
                 {
@@ -532,70 +533,6 @@ namespace WebSynthesis.Substring
                 return c;
             }
         }
-
-        /*private static IEnumerable<string> getStrings(string input, int output, bool left = true)
-        {
-            if (left)
-            {
-                for (int i = 1; i < input.Length - output; i++)
-                {
-                    yield return input.Substring(output, i);
-                }
-            }
-            else
-            {
-                for (int i = output - 1; i >= 0; i--)
-                {
-                    yield return input.Substring(i, output - i);
-                }
-            }
-        }
-
-        private static IEnumerable<Regex> getMatches(string input, int output, int len = 0)
-        {
-            List<Regex> chars = getChars();
-            foreach(Regex r in regexes.Concat(chars))
-            {
-                Match m = r.Match(input);
-                if (m.Index + m.Length*len == output)
-                {
-                    yield return r;
-                }
-            }
-        }
-        
-        private static List<Regex> getChars()
-        {
-            List<Regex> chars = new List<Regex>();
-            for (int i = 0; i < 127; i++)
-            {
-                char c = Convert.ToChar(i);
-                if (!char.IsControl(c))
-                {
-                    string r = @"[\" + c.ToString() + "]";
-                    if (isValidRegex(r))
-                        chars.Add(new Regex(r));
-                }
-            }
-
-            return chars;
-        }
-
-        private static bool isValidRegex(string r)
-        {
-            if (string.IsNullOrWhiteSpace(r)) return false;
-
-            try
-            {
-                Regex.Match("", r);
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-
-            return true;
-        } */
 
         #endregion
     }

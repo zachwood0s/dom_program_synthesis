@@ -60,5 +60,23 @@ namespace WebSynthesis.Joined
             testObject.RunTest();
         }
 
+        [TestMethod]
+        public void TestFinalPaperGrabPageTitle()
+        {
+            testObject.CreateExample("https://en.wikipedia.org/wiki/Program_synthesis", "Program synthesis");
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestFinalPaperGrabPageSubHeaders()
+        {
+            testObject.CreateExample("https://en.wikipedia.org/wiki/Program_synthesis", 
+                "Origin", "21st century developments", "The framework of Manna and Waldinger", 
+                "Proof rules", "Example", "See also", "Notes", "References"
+            );
+
+            testObject.RunTest();
+        }
     }
 }

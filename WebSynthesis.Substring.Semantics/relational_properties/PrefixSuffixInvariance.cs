@@ -12,7 +12,7 @@ namespace WebSynthesis.Substring.RelationalProperties
     {
         public string Name => "Substring Prefix Invariant";
         public Type Type => typeof(ProseHtmlNode);
-        private const int MaxReorderCount = 10;
+        private const int MaxReorderCount = 2;
         public IEnumerable<Tuple<object, object>> ApplyProperty(object input, object output)
         {
             var node = input as ProseHtmlNode;
@@ -62,7 +62,7 @@ namespace WebSynthesis.Substring.RelationalProperties
         {
             if (input.Text == null || !input.Text.Contains(output) || input.Text == output) return;
 
-            int index = input.Text.IndexOf(output) + output.Length - 1;
+            int index = input.Text.IndexOf(output) + output.Length;
             string subStr = input.Text.Substring(index, input.Text.Length - index);
 
             input.Text = input.Text.Substring(0, index) + PermuteString.Random(subStr);
@@ -75,8 +75,9 @@ namespace WebSynthesis.Substring.RelationalProperties
         public static string Random(string str)
         {
             string ret = "";
-            for (int i = 0; i < str.Length; i++)
-                ret += (char) random.Next(1, 127);
+            int l = random.Next(0, str.Length);
+            for (int i = 0; i < l; i++)
+                ret += (char) random.Next(32, 126);
             return ret;
         }
     }

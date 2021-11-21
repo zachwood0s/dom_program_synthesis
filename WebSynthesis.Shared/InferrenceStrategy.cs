@@ -106,9 +106,9 @@ namespace WebSynthesis.RelationalProperties
             if(!worker.Join(millisecondTimeBound))
             {
                 // Kill the worker if the timebound has been exceeded
-                ts.Cancel();
+                //ts.Cancel();
                 Console.WriteLine("Canceled");
-                _log.SaveLogToXML("synthesis_log.xml");
+                //_log.SaveLogToXML("synthesis_log.xml");
             }
             return output;
         }

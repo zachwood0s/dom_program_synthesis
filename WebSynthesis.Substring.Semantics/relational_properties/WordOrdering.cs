@@ -12,38 +12,42 @@ namespace WebSynthesis.Substring.RelationalProperties
     {
         public string Name => "Word Ordering";
         public Type Type => typeof(ProseHtmlNode);
-        private const int MaxReorderCount = 10;
+        private const int MaxReorderCount = 2;
         private static Random random = new Random();
         public IEnumerable<Tuple<object, object>> ApplyProperty(object input, object output)
         {
             var node = input as ProseHtmlNode;
-            var outstrs = output as List<string>;
             for (var i = 0; i < MaxReorderCount; i++)
             {
                 var newTree = node.DeepCopy();
-                foreach (string o in outstrs)
-                    newTree.Traverse(x => PermuteWords(x, o));
+                newTree.Traverse(x => PermuteWords(x));
                 if (!newTree.Equals(node))
                     yield return Tuple.Create<object, object>(newTree, output);
             }
         }
 
-        private void PermuteWords(ProseHtmlNode input, string output)
+        private void PermuteWords(ProseHtmlNode input)
         {
-            if (input.Text == null || !input.Text.Contains(output) || input.Text == output || !input.Text.Contains(" ")) return;
+            if (input.Text == null || !input.Text.Contains(" ")) return;
 
             List<string> words = input.Text.Split(" ").ToList();
             int l = words.Count;
-            string ret = "";
+            string ret = input.Text;
 
-            for(int i = 0; i < l; i++)
+            while (ret == input.Text)
             {
-                int j = random.Next(0, words.Count - 1);
-                ret += words[j] + " ";
-                words.Remove(words[j]);
+                ret = "";
+                List<string> newWords = new List<string>(words);
+                for (int i = 0; i < words.Count; i++)
+                {
+                    int j = random.Next(0, newWords.Count - 1);
+                    ret += newWords[j] + " ";
+                    newWords.Remove(newWords[j]);
+                }
+                ret = ret.Substring(0, ret.Length - 1);
             }
 
-            input.Text = ret.Substring(0, ret.Length - 1); ;
+            input.Text = ret;
         }
     }
 }

@@ -68,7 +68,7 @@ namespace WebSynthesis.RelationalProperties
             foreach(var prop in properties)
             {
                 var set = GetProgramSetTimed(examples, new HashSet<IRelationalProperty>() { prop }, TimeoutMillilseconds);
-                if(!set.IsEmpty)
+                if(set != null && !set.IsEmpty)
                 {
                     rApp.Add(prop);
                 }
@@ -110,7 +110,7 @@ namespace WebSynthesis.RelationalProperties
                         var unionSet = new HashSet<IRelationalProperty>(oldSat);
                         unionSet.Add(rNew);
                         var set = GetProgramSetTimed(examples, unionSet, TimeoutMillilseconds);
-                        if (!set.IsEmpty)
+                        if (set != null && !set.IsEmpty)
                         {
                             newRSat.Add(unionSet);
                         }
