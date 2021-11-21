@@ -125,6 +125,7 @@ namespace WebSynthesis.TreeManipulation
             var newNode = DeserializeFromHtmlNode(node, null);
 
             newNode.RemoveDuplicates();
+            newNode.Simplify();
             return newNode;
         }
 
@@ -255,6 +256,20 @@ namespace WebSynthesis.TreeManipulation
                 }
             }
             Console.WriteLine($"Removed {count} duplicates");
+        }
+
+        public void Simplify()
+        {
+            Traverse(x =>
+            {
+                // Pull the children text into the parent if the only child is just a text node
+                if(x.ChildNodes.Count == 1 && x.ChildNodes[0].Name == "#text")
+                {
+                    x.Text = x.ChildNodes[0].Text;
+                    x._childNodes.RemoveAt(0);
+                    x._cachedHashCode = null;
+                }
+            });
         }
 
         public ProseHtmlNode DeepCopy()
