@@ -522,9 +522,9 @@ namespace WebSynthesis.Substring
                 {
                     c = input[start - 1];
                 }
-                else if (start + output.First().Count() < input.Length)
+                else if (start + output[index].Count() < input.Length)
                 {
-                    c = input[start + output.First().Count()];
+                    c = input[start + output[index].Count()];
                 }
 
                 if (c == null) return null;
