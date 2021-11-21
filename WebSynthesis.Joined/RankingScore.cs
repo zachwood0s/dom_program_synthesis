@@ -30,9 +30,9 @@ namespace WebSynthesis.Joined
         }
 
         [FeatureCalculator(nameof(Semantics.Concat))]
-        public static double NodesToStrs(double a, double b)
+        public static double Concat(double a, double b)
         {
-            return a + b;
+            return - Math.Abs(a + b) - 10000;
         }
 
         [FeatureCalculator(nameof(Semantics.StrToTree))]

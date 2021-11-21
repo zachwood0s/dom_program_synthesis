@@ -17,6 +17,60 @@ namespace WebSynthesis.Joined
         public WitnessFunctions(Grammar grammar) : base(grammar)
         {
         }
+
+        #region Concat
+
+        [WitnessFunction(nameof(Semantics.Concat), 0)]
+        public ExampleSpec WitnessConcat1(GrammarRule rule, ExampleSpec spec)
+        {
+            var result = new Dictionary<State, object>();
+
+            foreach (KeyValuePair<State, object> example in spec.Examples)
+            {
+                State inputState = example.Key;
+                var output = example.Value as IReadOnlyList<string>;
+
+                if (output.Count == 1)
+                    return null;
+
+
+                result[inputState] = new List<string>() { output[0] };
+            }
+            return new ExampleSpec(result);
+        }
+
+
+        [WitnessFunction(nameof(Semantics.Concat), 1, DependsOnParameters =new[] { 0 })]
+        public ExampleSpec WitnessConcat2(GrammarRule rule, ExampleSpec spec, ExampleSpec startSpec)
+        {
+            var result = new Dictionary<State, object>();
+
+            foreach (KeyValuePair<State, object> example in spec.Examples)
+            {
+                State inputState = example.Key;
+                var output = example.Value as IReadOnlyList<string>;
+
+                result[inputState] = output.Skip(1).ToList();
+
+            }
+            return new ExampleSpec(result);
+        }
+
+        #endregion
+
+            /*
+        [WitnessFunction("JoinMap", 0, DependsOnParameters = new[] { 1 })]
+        public DisjunctiveExamplesSpec WitnessLinesMap1(GrammarRule rule, ExampleSpec spec, ExampleSpec nodes)
+        {
+            var linesExamples = new Dictionary<State, IEnumerable<object>>();
+            foreach (State input in spec.ProvidedInputs)
+            {
+                linesExamples[input] = spec.DisjunctiveExamples[input];
+            }
+            return new DisjunctiveExamplesSpec(linesExamples);
+        }
+        */
+
         [WitnessFunction("JoinMap", 1)]
         public DisjunctiveExamplesSpec WitnessLinesMap(GrammarRule rule, ExampleSpec spec)
         {
@@ -25,19 +79,23 @@ namespace WebSynthesis.Joined
             {
                 var possibleNodesForEachText = new List<List<string>>();
                 var tree = input[rule.Grammar.InputSymbol] as ProseHtmlNode;
-                var selections = spec.Examples[input] as IEnumerable<string>;
 
                 var allNodes = new[] { tree }.RecursiveSelect(x => x.ChildNodes)
                                              .Where(x => x.Text != null)
                                              .Select(x => x.Text)
                                              .ToList();
+                var selections = spec.Examples[input] as IEnumerable<string>;
                 foreach (string example in selections)
                 {
                     var nodeTexts = new List<string>();
 
                     var best = Process.ExtractSorted(example, allNodes, cutoff: 95);
+                    var lastValue = 0;
                     foreach (var n in best)
                     {
+                        if (lastValue != 0 && n.Score != lastValue)
+                            break;
+                        lastValue = n.Score;
                         nodeTexts.Add(n.Value);
                     }
                     possibleNodesForEachText.Add(nodeTexts);

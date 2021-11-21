@@ -19,6 +19,8 @@ namespace WebSynthesis.TreeManipulation
         {
             private Dictionary<TIn, TOut> _cachedValues;
             private Func<TIn, TOut> _calcFunc;
+            private int _cacheHit = 0;
+            private int _cacheMiss = 0;
 
             public CachedCalculation(Func<TIn, TOut> calcFunc)
             {
@@ -29,11 +31,18 @@ namespace WebSynthesis.TreeManipulation
             {
                 if(_cachedValues.TryGetValue(inputState, out var res))
                 {
+                    _cacheHit++;
                     return res;
                 }
+                _cacheMiss++;
+
                 var newVal = _calcFunc(inputState);
                 _cachedValues[inputState] = newVal;
                 return newVal;
+            }
+            public override string ToString()
+            {
+                return $"{_cacheHit} / {_cacheMiss}";
             }
         };
 
@@ -252,7 +261,7 @@ namespace WebSynthesis.TreeManipulation
         private CachedCalculation<Tuple<ProseHtmlNode, string>, List<Tuple<ProseHtmlNode, List<ProseHtmlNode>>>> descendentsByTag
             = new CachedCalculation<Tuple<ProseHtmlNode, string>, List<Tuple<ProseHtmlNode, List<ProseHtmlNode>>>>(
                 input => new[] { input.Item1 }.RecursiveSelect(x => x.ChildNodes)
-                         .Select(x => Tuple.Create(x, Semantics.Descendants(x).Where(i => i.Name == input.Item2).ToList()))
+                         .Select(x => Tuple.Create(x, Semantics.DescendantsWithTag(x, input.Item2).ToList()))
                          .ToList()
             );
 
@@ -371,6 +380,13 @@ namespace WebSynthesis.TreeManipulation
 
         #region Descendants With Attr
 
+        private CachedCalculation<Tuple<ProseHtmlNode, string>, List<Tuple<ProseHtmlNode, List<ProseHtmlNode>>>> descendentsByAttr
+            = new CachedCalculation<Tuple<ProseHtmlNode, string>, List<Tuple<ProseHtmlNode, List<ProseHtmlNode>>>>(
+                input => new[] { input.Item1 }.RecursiveSelect(x => x.ChildNodes)
+                         .Select(x => Tuple.Create(x, Semantics.DescendantsWithAttr(x, input.Item2).ToList()))
+                         .ToList()
+            );
+
         [WitnessFunction(nameof(Semantics.DescendantsWithAttr), 0, DependsOnParameters = new[] { 1 })]
         public DisjunctiveExamplesSpec WitnessDescendantsWithAttrSubseq(GrammarRule rule, DisjunctiveSubsequenceSpec spec, ExampleSpec tagSpec)
         {
@@ -386,9 +402,10 @@ namespace WebSynthesis.TreeManipulation
                 var occList = new List<ProseHtmlNode>();
                 foreach (IEnumerable<object> output in example.Value)
                 {
-                    var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
-                                      where Semantics.Descendants(i).Where(x => x[attr] != null).ContainsSubsequence(output)
-                                      select i;
+                    var descendents = descendentsByAttr.GetValue(Tuple.Create(input[0], attr));
+                    var occurrences = from i in descendents
+                                      where i.Item2.ContainsSubsequence(output)
+                                      select i.Item1;
 
                     occList.AddRange(occurrences);
                 }
@@ -397,6 +414,7 @@ namespace WebSynthesis.TreeManipulation
                     return null;
                 result[inputState] = occList.Distinct().ToList();
             }
+            Console.WriteLine(descendentsByAttr);
             return new DisjunctiveExamplesSpec(result);
         }
 
@@ -447,9 +465,10 @@ namespace WebSynthesis.TreeManipulation
                 var occList = new List<ProseHtmlNode>();
                 foreach (IEnumerable<ProseHtmlNode> output in example.Value)
                 {
-                    var occurrences = from i in input.RecursiveSelect(x => x.ChildNodes)
-                                      where Semantics.Descendants(i).Where(x => x[attr] != null).SequenceEqual(output)
-                                      select i;
+                    var descendents = descendentsByAttr.GetValue(Tuple.Create(input[0], attr));
+                    var occurrences = from i in descendents
+                                      where i.Item2.SequenceEqual(output)
+                                      select i.Item1;
 
                     occList.AddRange(occurrences);
                 }
@@ -458,6 +477,7 @@ namespace WebSynthesis.TreeManipulation
                     return null;
                 result[inputState] = occList.Distinct().ToList();
             }
+            Console.WriteLine(descendentsByAttr);
             return new DisjunctiveExamplesSpec(result);
         }
 
@@ -497,6 +517,13 @@ namespace WebSynthesis.TreeManipulation
 
         #region Descendants Attribute Value
 
+        private CachedCalculation<Tuple<ProseHtmlNode, string, string>, List<Tuple<ProseHtmlNode, List<ProseHtmlNode>>>> descendentsByAttrValue
+            = new CachedCalculation<Tuple<ProseHtmlNode, string, string>, List<Tuple<ProseHtmlNode, List<ProseHtmlNode>>>>(
+                input => new[] { input.Item1 }.RecursiveSelect(x => x.ChildNodes)
+                         .Select(x => Tuple.Create(x, Semantics.Descendants(x).Where(i => i[input.Item2]?.Value == input.Item3).ToList()))
+                         .ToList()
+            );
+
         [WitnessFunction(nameof(Semantics.DescendantsWithAttrValue), 0, DependsOnParameters = new[] { 1, 2 })]
         public DisjunctiveExamplesSpec WitnessDescendantsWithAttrValueSubseq(GrammarRule rule, DisjunctiveSubsequenceSpec spec, ExampleSpec tagSpec, ExampleSpec valueSpec)
         {
@@ -524,6 +551,7 @@ namespace WebSynthesis.TreeManipulation
                     return null;
                 result[inputState] = occList.Distinct().ToList();
             }
+            Console.WriteLine(descendentsByAttrValue);
             return new DisjunctiveExamplesSpec(result);
         }
 
@@ -615,6 +643,7 @@ namespace WebSynthesis.TreeManipulation
                     return null;
                 result[inputState] = occList.Distinct().ToList();
             }
+            Console.WriteLine(descendentsByAttrValue);
             return new DisjunctiveExamplesSpec(result);
         }
 
