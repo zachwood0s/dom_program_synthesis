@@ -59,5 +59,25 @@ namespace WebSynthesis.TreeManipulation
 
             testObject.RunTest();
         }
+
+        [TestMethod]
+        public void TestEducationWebpage()
+        {
+            testObject.CreateExample(
+                "https://www.cs.purdue.edu/people/faculty/clifton.html",
+
+                //Expected Output
+                "Education",
+                "PhD, Princeton University, Computer Science  (1991) ");
+
+            testObject.CreateExample(
+                "https://www.cs.purdue.edu/people/faculty/chjung.html",
+
+                //Expected Output
+                "Education",
+                "PhD, Georgia Institute of Technology, Computer Science  (2013) ");
+
+            testObject.RunTest();
+        }
     }
 }

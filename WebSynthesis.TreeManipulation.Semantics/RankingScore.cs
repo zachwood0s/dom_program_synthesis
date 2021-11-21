@@ -10,8 +10,12 @@ namespace WebSynthesis.TreeManipulation
 {
     public class RankingScore : Feature<double>
     {
+        private LikelihoodScore likelihood;
+        private ReadabilityScore readability;
         public RankingScore(Grammar grammar) : base(grammar, "Score")
         {
+            likelihood = new LikelihoodScore(grammar);
+            readability = new ReadabilityScore(grammar);
             //Microsoft.ProgramSynthesis.Rules.Concepts.
         }
         protected override double GetFeatureValueForVariable(VariableNode variable) => 0;
@@ -30,6 +34,10 @@ namespace WebSynthesis.TreeManipulation
 
         [FeatureCalculator(nameof(Semantics.DescendantsWithAttr))]
         public static double DescendantsWithAttr(double node, double tag) => LikelihoodScore.DescendantsWithAttr(node, tag) + ReadabilityScore.DescendantsWithAttr(node, tag); 
+
+        [FeatureCalculator(nameof(Semantics.DescendantsWithAttrValue), Method = CalculationMethod.FromChildrenNodes)]
+        public double DescendantsWithAttrValue(NonterminalNode node, LiteralNode tag, LiteralNode value)
+            => likelihood.DescendantsWithAttrValue(node, tag, value) + readability.DescendantsWithAttrValue(node, tag, value); 
 
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => LikelihoodScore.Single(node) + ReadabilityScore.Single(node);
@@ -75,7 +83,22 @@ namespace WebSynthesis.TreeManipulation
         public static double DescendantsWithTag(double node, double tag) => node + tag; 
 
         [FeatureCalculator(nameof(Semantics.DescendantsWithAttr))]
-        public static double DescendantsWithAttr(double node, double tag) => node + tag + discourage; 
+        public static double DescendantsWithAttr(double node, double tag) => node + tag + discourage;
+
+        [FeatureCalculator(nameof(Semantics.DescendantsWithAttrValue), Method = CalculationMethod.FromChildrenNodes)]
+        public double DescendantsWithAttrValue(NonterminalNode node, LiteralNode tag, LiteralNode value)
+        {
+            if((string) tag.Value == "style")
+            {
+                // Strongly strongly discourage the use of style as an attribute
+                return node.GetFeatureValue(this) + tag.GetFeatureValue(this) + value.GetFeatureValue(this) - 100;
+            }
+            else
+            {
+                // All other attribute values are good
+                return node.GetFeatureValue(this) + tag.GetFeatureValue(this) + value.GetFeatureValue(this) + encourage;
+            }
+        }
 
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => node - 1;
@@ -118,6 +141,10 @@ namespace WebSynthesis.TreeManipulation
 
         [FeatureCalculator(nameof(Semantics.DescendantsWithAttr))]
         public static double DescendantsWithAttr(double node, double tag) => node + tag + depthPenalty; 
+
+        [FeatureCalculator(nameof(Semantics.DescendantsWithAttrValue), Method = CalculationMethod.FromChildrenNodes)]
+        public double DescendantsWithAttrValue(NonterminalNode node, LiteralNode tag, LiteralNode value)
+            => node.GetFeatureValue(this) + tag.GetFeatureValue(this) + value.GetFeatureValue(this) + depthPenalty; 
 
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => node + depthPenalty;

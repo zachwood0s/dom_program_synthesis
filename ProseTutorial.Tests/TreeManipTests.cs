@@ -301,6 +301,30 @@ namespace WebSynthesis.TreeManipulation
         }
 
         [TestMethod]
+        public void TestLearnAttributeValue()
+        {
+            // Searching for nodes with an "id" attribute
+            testObject.CreateExample(
+                Html("<parent><special1 id='wrong'/><child2 id='hello'/><this id='important'/><special2 id='goodbye' notImportant='eh'/></parent>"),
+
+                // Expected
+                Html("<this id='important'/>"));
+
+            testObject.CreateExample(
+                Html("<parent><special1 id='hello'/><child2 id='important'/><this id='important'/><special2 id='goodbye' notImportant='eh'/></parent>"),
+
+                Html("<child2 id='important'/>"),
+                Html("<this id='important'/>"));
+
+            testObject.CreateTestCase(
+                Html("<parent><child1 wrong='wrong'><child3/><special wrong='wrong'/></child1><child2 id='important'/><child4/></parent>"),
+
+                Html("<child2 id='important'/>"));
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
         public void TestLearnKthChildByAttribute()
         {
             // Searching for nodes with an "id" attribute

@@ -66,7 +66,7 @@ namespace WebSynthesis.RelationalProperties
         }
         private SynthesisEngine ConfigureSynthesis(Grammar grammar, Func<Grammar, DomainLearningLogic> creator)
         {
-            _log = new LogListener();
+            _log = new LogListener(LogInfo.AllAbbreviated);
             var witnessFunctions = creator(grammar);
             var deductiveSynthesis = new DeductiveSynthesis(witnessFunctions);
             var synthesisExtrategies = new ISynthesisStrategy[] { deductiveSynthesis };
@@ -89,7 +89,7 @@ namespace WebSynthesis.RelationalProperties
             var spec = GetExampleSpec(pExamples);
             var res = _prose.LearnGrammarTopK(spec, _score, k: 1, cancel: ct);
 
-            //_log.SaveLogToXML("synthesis_log.xml");
+            _log.SaveLogToXML("synthesis_log.xml");
             return res;
         }
 
