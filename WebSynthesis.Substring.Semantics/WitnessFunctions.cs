@@ -524,7 +524,14 @@ namespace WebSynthesis.Substring
                 }
                 else if (start + output.First().Count() < input.Length)
                 {
-                    c = input[start + output.First().Count()];
+                    try
+                    {
+                        c = input[start + output.First().Count()];
+                    }
+                    catch
+                    {
+                        Console.WriteLine("oops");
+                    }
                 }
 
                 if (c == null) return null;

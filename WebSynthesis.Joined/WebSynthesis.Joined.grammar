@@ -14,10 +14,10 @@ language JoinedSynthesis;
 
 @input ProseHtmlNode inTree;
 
-@start IReadOnlyList<ProseHtmlNode> program := strs
+@start IReadOnlyList<ProseHtmlNode> program := cat
 
 IReadOnlyList<string> cat 
-	:= Concat(cat, cat)
+	:= Concat(strs, cat)
 	 | strs
 
 IReadOnlyList<string> strs 
