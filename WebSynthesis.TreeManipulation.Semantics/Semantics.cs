@@ -17,9 +17,14 @@ namespace WebSynthesis.TreeManipulation
             return node.ChildNodes.ToList();
         }
 
+        private static Dictionary<ProseHtmlNode, IReadOnlyList<ProseHtmlNode>> _cachedDescendants = new Dictionary<ProseHtmlNode, IReadOnlyList<ProseHtmlNode>>();
         public static IReadOnlyList<ProseHtmlNode> Descendants(ProseHtmlNode node)
         {
-            return node.Descendants.ToList();
+            if (_cachedDescendants.TryGetValue(node, out var res))
+                return res;
+            var newList = node.Descendants.ToList();
+            _cachedDescendants[node] = newList;
+            return newList;
         }
 
         public static IReadOnlyList<ProseHtmlNode> Single(ProseHtmlNode node)
@@ -33,18 +38,31 @@ namespace WebSynthesis.TreeManipulation
             var key = Tuple.Create(tag, node);
             if (_cached.TryGetValue(key, out var res))
                 return res;
-            var newList = node.Descendants.Where(x => x.Name == tag).ToList();
+            var newList = Descendants(node).Where(x => x.Name == tag).ToList();
             _cached[key] = newList;
             return newList;
         }
+
+        private static Dictionary<Tuple<string, ProseHtmlNode>, IReadOnlyList<ProseHtmlNode>> _cachedAttrs = new Dictionary<Tuple<string, ProseHtmlNode>, IReadOnlyList<ProseHtmlNode>>();
         public static IReadOnlyList<ProseHtmlNode> DescendantsWithAttr(ProseHtmlNode node, string attr)
         {
-            return node.Descendants.Where(x => x[attr] != null).ToList();
+            var key = Tuple.Create(attr, node);
+            if (_cachedAttrs.TryGetValue(key, out var res))
+                return res;
+            var newList = Descendants(node).Where(x => x[attr] != null).ToList();
+            _cachedAttrs[key] = newList;
+            return newList;
         }
 
+        private static Dictionary<Tuple<string, string, ProseHtmlNode>, IReadOnlyList<ProseHtmlNode>> _cachedAttrValues = new Dictionary<Tuple<string, string, ProseHtmlNode>, IReadOnlyList<ProseHtmlNode>>();
         public static IReadOnlyList<ProseHtmlNode> DescendantsWithAttrValue(ProseHtmlNode node, string attr, string value)
         {
-            return node.Descendants.Where(x => x[attr]?.Value == value).ToList();
+            var key = Tuple.Create(attr, value, node);
+            if (_cachedAttrValues.TryGetValue(key, out var res))
+                return res;
+            var newList = Descendants(node).Where(x => x[attr]?.Value == value).ToList();
+            _cachedAttrValues[key] = newList;
+            return newList;
         }
 
         public static bool MatchTag(ProseHtmlNode n, string tag)

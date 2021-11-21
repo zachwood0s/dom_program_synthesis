@@ -48,7 +48,6 @@ namespace WebSynthesis.Joined
             foreach (KeyValuePair<State, object> example in spec.Examples)
             {
                 State inputState = example.Key;
-                var possibilities = new List<IReadOnlyList<string>>();
                 var output = example.Value as IReadOnlyList<string>;
 
                 result[inputState] = output.Skip(1).ToList();
@@ -91,8 +90,12 @@ namespace WebSynthesis.Joined
                     var nodeTexts = new List<string>();
 
                     var best = Process.ExtractSorted(example, allNodes, cutoff: 95);
+                    var lastValue = 0;
                     foreach (var n in best)
                     {
+                        if (lastValue != 0 && n.Score != lastValue)
+                            break;
+                        lastValue = n.Score;
                         nodeTexts.Add(n.Value);
                     }
                     possibleNodesForEachText.Add(nodeTexts);

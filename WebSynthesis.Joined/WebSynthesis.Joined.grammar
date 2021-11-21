@@ -17,8 +17,8 @@ language JoinedSynthesis;
 @start IReadOnlyList<ProseHtmlNode> program := cat
 
 IReadOnlyList<string> cat 
-	:= Concat(strs, cat)
-	 | strs
+	:= strs
+	 | Concat(strs, cat)
 
 IReadOnlyList<string> strs 
 	:= JoinMap(substring, nodeStrs) = Map(\str: string => substring, nodeStrs);

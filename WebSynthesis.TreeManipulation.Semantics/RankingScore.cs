@@ -96,7 +96,7 @@ namespace WebSynthesis.TreeManipulation
             else
             {
                 // All other attribute values are good
-                return node.GetFeatureValue(this) + tag.GetFeatureValue(this) + value.GetFeatureValue(this) + encourage;
+                return node.GetFeatureValue(this) + tag.GetFeatureValue(this) + value.GetFeatureValue(this);
             }
         }
 
@@ -144,7 +144,7 @@ namespace WebSynthesis.TreeManipulation
 
         [FeatureCalculator(nameof(Semantics.DescendantsWithAttrValue), Method = CalculationMethod.FromChildrenNodes)]
         public double DescendantsWithAttrValue(NonterminalNode node, LiteralNode tag, LiteralNode value)
-            => node.GetFeatureValue(this) + tag.GetFeatureValue(this) + value.GetFeatureValue(this) + depthPenalty; 
+            => node.GetFeatureValue(this) + tag.GetFeatureValue(this) + value.GetFeatureValue(this); 
 
         [FeatureCalculator(nameof(Semantics.Single))]
         public static double Single(double node) => node + depthPenalty;
