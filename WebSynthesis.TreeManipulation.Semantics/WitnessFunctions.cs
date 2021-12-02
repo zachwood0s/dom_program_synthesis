@@ -414,7 +414,7 @@ namespace WebSynthesis.TreeManipulation
                     return null;
                 result[inputState] = occList.Distinct().ToList();
             }
-            Console.WriteLine(descendentsByAttr);
+            //Console.WriteLine(descendentsByAttr);
             return new DisjunctiveExamplesSpec(result);
         }
 
@@ -477,7 +477,7 @@ namespace WebSynthesis.TreeManipulation
                     return null;
                 result[inputState] = occList.Distinct().ToList();
             }
-            Console.WriteLine(descendentsByAttr);
+            //Console.WriteLine(descendentsByAttr);
             return new DisjunctiveExamplesSpec(result);
         }
 
@@ -551,7 +551,7 @@ namespace WebSynthesis.TreeManipulation
                     return null;
                 result[inputState] = occList.Distinct().ToList();
             }
-            Console.WriteLine(descendentsByAttrValue);
+            //Console.WriteLine(descendentsByAttrValue);
             return new DisjunctiveExamplesSpec(result);
         }
 

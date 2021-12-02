@@ -89,7 +89,7 @@ namespace WebSynthesis.RelationalProperties
             var spec = GetExampleSpec(pExamples);
             var res = _prose.LearnGrammarTopK(spec, _score, k: 1, cancel: ct);
 
-            _log.SaveLogToXML("synthesis_log.xml");
+            //_log.SaveLogToXML("synthesis_log.xml");
             return res;
         }
 
@@ -106,7 +106,7 @@ namespace WebSynthesis.RelationalProperties
             if(!worker.Join(millisecondTimeBound))
             {
                 // Kill the worker if the timebound has been exceeded
-                //ts.Cancel();
+                ts.Cancel();
                 Console.WriteLine("Canceled");
                 //_log.SaveLogToXML("synthesis_log.xml");
             }

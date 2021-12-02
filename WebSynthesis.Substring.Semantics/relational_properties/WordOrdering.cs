@@ -7,7 +7,7 @@ using WebSynthesis.TreeManipulation;
 
 namespace WebSynthesis.Substring.RelationalProperties
 {
-    [RelationalProperty("Word Ordering", typeof(ProseHtmlNode))]
+    //[RelationalProperty("Word Ordering", typeof(ProseHtmlNode))]
     public class WordOrdering : IRelationalProperty
     {
         public string Name => "Word Ordering";

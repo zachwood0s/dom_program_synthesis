@@ -19,7 +19,7 @@ using Tests.Utils;
 namespace WebSynthesis.Joined
 {
     [TestClass]
-    public class JoinedTests
+    public class ComparisonTests
     {
         private static JoinedWebscrapeTestObject testObject;
 

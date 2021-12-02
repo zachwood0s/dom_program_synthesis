@@ -19,6 +19,7 @@ using HtmlAgilityPack;
 using System.Xml.Linq;
 using WebSynthesis.TreeManipulation;
 using WebSynthesis.RelationalProperties;
+using System.Diagnostics;
 
 namespace Tests.Utils
 {
@@ -34,7 +35,7 @@ namespace Tests.Utils
         private SynthesisEngine _prose;
         private IFeature _score;
 
-        private ApplicationStrategy _strategy;
+        private RelationalApplicationStrategy _strategy;
 
         public TestObject(string grammar)
         {
@@ -83,8 +84,12 @@ namespace Tests.Utils
 
         public void RunTest()
         {
+            var watch = new Stopwatch();
+            watch.Start();
             var casted = Examples.Select(x => new Tuple<object, object>(x.Item1, x.Item2));
             var learnedSet = _strategy.GetProgramSet(casted);
+            watch.Stop();
+            Console.WriteLine($"Created program in {watch.Elapsed.TotalSeconds} secs");
             /*
             var spec = getExampleSpec(_grammar);
 
@@ -242,7 +247,7 @@ namespace Tests.Utils
 
         protected override void AssertTruth(IEnumerable<string> expected, object actual)
         {
-            Console.WriteLine($"Expected: {string.Join(',', expected.ToArray())}");
+            Console.WriteLine($"\nExpected: {string.Join(',', expected.ToArray())}");
             Console.WriteLine($"Actual: {string.Join(',', (actual as IEnumerable<object>).ToArray())}");
             Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
         }
