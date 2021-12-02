@@ -79,5 +79,21 @@ namespace WebSynthesis.TreeManipulation
 
             testObject.RunTest();
         }
+
+        [TestMethod]
+        public void TestTOC()
+        {
+            testObject.CreateExample("https://en.wikipedia.org/wiki/Program_synthesis",
+                "<span class='toctext'>Origin</span>", 
+                "<span class='toctext'>21st century developments</span>", 
+                "<span class='toctext'>The framework of Manna and Waldinger</span>",
+                "<span class='toctext'>Proof rules</span>", 
+                "<span class='toctext'>Example</span>", 
+                "<span class='toctext'>See also</span>", 
+                "<span class='toctext'>Notes</span>", 
+                "<span class='toctext'>References</span>"
+            );
+            testObject.RunTest();
+        }
     }
 }

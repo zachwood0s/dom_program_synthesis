@@ -436,8 +436,6 @@ namespace WebSynthesis.TreeManipulation
                         var set = new HashSet<string>(attrSet.Select(x => x.Name));
                         resSet.IntersectWith(set);
                     }
-                    if (resSet.Count == 0)
-                        return null;
 
                     possibilites.AddRange(resSet);
                 }
@@ -499,8 +497,6 @@ namespace WebSynthesis.TreeManipulation
                         var set = new HashSet<string>(attrSet.Select(x => x.Name));
                         resSet.IntersectWith(set);
                     }
-                    if (resSet.Count == 0)
-                        return null;
 
                     possibilites.AddRange(resSet);
                 }
@@ -573,8 +569,6 @@ namespace WebSynthesis.TreeManipulation
                         var set = new HashSet<string>(attrSet.Select(x => x.Name));
                         resSet.IntersectWith(set);
                     }
-                    if (resSet.Count == 0)
-                        return null;
 
                     possibilites.AddRange(resSet);
                 }
@@ -665,8 +659,6 @@ namespace WebSynthesis.TreeManipulation
                         var set = new HashSet<string>(attrSet.Select(x => x.Name));
                         resSet.IntersectWith(set);
                     }
-                    if (resSet.Count == 0)
-                        return null;
 
                     possibilites.AddRange(resSet);
                 }
@@ -694,7 +686,7 @@ namespace WebSynthesis.TreeManipulation
                     foreach(var o in output)
                     {
                         if (o[tag] == null)
-                            return null;
+                            break;
 
                         possibilites.Add(o[tag].Value.Value);
                     }
