@@ -53,8 +53,18 @@ namespace WebSynthesis.Comparison
         [TestMethod]
         public void TestWikipediaHeaders()
         {
-            testObject.CreateExample("https://en.wikipedia.org/wiki/Israeli_Navy_Band",
-                "History", "Early years", "1970s", "1980s and present", "Notable members", "References");
+            testObject.CreateExample("https://en.wikipedia.org/wiki/Israeli_Navy_Band", "History");
+            testObject.CreateExample("https://en.wikipedia.org/wiki/Program_synthesis", "Origin");
+
+
+            testObject.RunTest();
+        }
+
+        [TestMethod]
+        public void TestWikipediaCapitals()
+        {
+            testObject.CreateExample("https://en.wikipedia.org/wiki/Colorado", "Denver");
+            testObject.CreateExample("https://en.wikipedia.org/wiki/Kansas", "Topeka");
 
             testObject.RunTest();
         }
