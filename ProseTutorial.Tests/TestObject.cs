@@ -89,17 +89,28 @@ namespace Tests.Utils
             var casted = Examples.Select(x => new Tuple<object, object>(x.Item1, x.Item2));
             var learnedSet = _strategy.GetProgramSet(casted);
             watch.Stop();
-            Console.WriteLine($"Created program in {watch.Elapsed.TotalSeconds} secs");
+            
             /*
             var spec = getExampleSpec(_grammar);
 
             ProgramSet learnedSet = _prose.LearnGrammarTopK(spec, _score, k: 1);
             */
+
+            if (learnedSet == null)
+            {
+                Console.WriteLine("No programs were learned.");
+                return;
+            }
+
             IEnumerable<ProgramNode> programs = learnedSet.RealizedPrograms;
 
             if (programs.Count() == 0)
-                Assert.Fail("No programs were learned.");
+            {
+                Console.WriteLine("No programs were learned.");
+                return;
+            }
 
+            Console.WriteLine($"Created program in {watch.Elapsed.TotalSeconds} secs");
             Console.WriteLine($"Picking best program: {programs.First()}");
 
             foreach(var example in Examples)
@@ -107,16 +118,35 @@ namespace Tests.Utils
                 runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
             }
 
+            int failedTests = 0;
             foreach (var example in TestCases)
             {
-                runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
+                failedTests += runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
             }
+
+            Console.WriteLine($"Tests passed {TestCases.Count - failedTests}/{TestCases.Count} | {(TestCases.Count - failedTests) / (float) TestCases.Count}%");
         }
 
-        private void runRealizedProgramWith(ProgramNode program, Grammar grammar, TIn input, TOut output)
+        private int runRealizedProgramWith(ProgramNode program, Grammar grammar, TIn input, TOut output)
         {
             State state = State.CreateForExecution(grammar.InputSymbol, input);
-            AssertTruth(output, program.Invoke(state));
+            var actual = program.Invoke(state);
+            if (actual == null)
+            {
+                Console.WriteLine("Program failed to return!");
+                return 1;
+            }
+
+            try 
+            {
+                AssertTruth(output, actual);
+                return 0;
+            }
+            catch
+            {
+                return 1;
+            }
+            
         }
 
         private ExampleSpec getExampleSpec(Grammar grammar)
@@ -151,7 +181,6 @@ namespace Tests.Utils
 
         protected virtual void AssertTruth(TOut expected, object actual)
         {
-
             Assert.AreEqual(expected, actual as TOut);
         }
     }
@@ -247,8 +276,8 @@ namespace Tests.Utils
 
         protected override void AssertTruth(IEnumerable<string> expected, object actual)
         {
-            Console.WriteLine($"\nExpected: {string.Join(',', expected.ToArray())}");
-            Console.WriteLine($"Actual: {string.Join(',', (actual as IEnumerable<object>).ToArray())}");
+            //Console.WriteLine($"\nExpected: {string.Join(',', expected.ToArray())}");
+            //Console.WriteLine($"Actual: {string.Join(',', (actual as IEnumerable<object>).ToArray())}");
             Assert.IsTrue(expected.SequenceEqual(actual as IEnumerable<object>));
         }
 

@@ -17,15 +17,17 @@ namespace Tests.Utils
 {
     public class TestComparisonObject
     {
-        private List<Constraint<IRow, object>> constraints;
-        private List<Tuple<InputRow, string>> testCases;
+        private List<List<Constraint<IRow, object>>> constraints;
+        private List<Tuple<InputRow, string[]>> testCases;
         private JoinedWebscrapeTestObject testObject;
+
+        public int ExampleCount { get { return testObject.Examples.Count; } }
 
         public TestComparisonObject() 
         {
             testObject = new JoinedWebscrapeTestObject("WebSynthesis.Joined.grammar");
-            constraints = new List<Constraint<IRow, object>>();
-            testCases = new List<Tuple<InputRow, string>>();
+            constraints = new List<List<Constraint<IRow, object>>>();
+            testCases = new List<Tuple<InputRow, string[]>>();
 
             testObject.Init(
                 g => new WebSynthesis.Joined.RankingScore(g),
@@ -53,13 +55,20 @@ namespace Tests.Utils
 
         public void CreateTextExample(string url, params string[] output)
         {
-            constraints.Add(new Example(getInputRow(url), converOutputStr(output)));
+            for(int i = 0; i < output.Length; i++)
+            {
+                if (constraints.Count <= i)
+                {
+                    constraints.Add(new List<Constraint<IRow, object>>());
+                }
+                constraints[i].Add(new Example(getInputRow(url), output[i]));
+            }
         }
 
         public void CreateTestCase(string url, params string[] output)
         {
             testObject.CreateTestCase(url, output);
-            testCases.Add(new Tuple<InputRow, string>(getInputRow(url), converOutputStr(output)));
+            testCases.Add(new Tuple<InputRow, string[]>(getInputRow(url), output));
         }
 
         public void RunTest()
@@ -70,37 +79,45 @@ namespace Tests.Utils
 
         public void RunWebTest()
         {
-            Console.WriteLine("\nRunning Webscrape Tests:");
             testObject.RunTest();
         }
 
         public void RunTextTest()
         {
             Console.WriteLine("\nRunning FlashExtract Tests:");
+
             var watch = new Stopwatch();
             watch.Start();
-            Program program = Learner.Instance.Learn(constraints);
+            List<Program> programs = new List<Program>();
+            foreach (List<Constraint<IRow, object>> c in constraints) programs.Add(Learner.Instance.Learn(c));
             watch.Stop();
+
             Console.WriteLine($"Created program in {watch.Elapsed.TotalSeconds} secs");
 
-            if (program == null)
+            int failedTests = 0;
+            for(int i = 0; i < programs.Count; i++)
             {
-                Console.WriteLine("Cound not find program!");
-                return;
+                if (programs[i] == null)
+                {
+                    Assert.Fail("Cound not find program!");
+                }
+
+                foreach (Tuple<InputRow, string[]> testCase in testCases)
+                {
+                    string output = programs[i].Run(testCase.Item1) as string;
+                    //Console.WriteLine($"\nExpected: {testCase.Item2[i]}");
+                    //Console.WriteLine($"Actual: {output}");
+                    if (testCase.Item2[i] != output)
+                        failedTests++;
+                }
             }
 
-            foreach(Tuple<InputRow, string> testCase in testCases)
-            {
-                string output = program.Run(testCase.Item1) as string;
-                Console.WriteLine($"\nExpected: {testCase.Item2}");
-                Console.WriteLine($"Actual: {output}");
-                Assert.AreEqual(testCase.Item2, output);
-            }
+            Console.WriteLine($"Tests passed {testCases.Count - failedTests}/{testCases.Count} | {(testCases.Count - failedTests) / (float)testCases.Count}%");
         }
 
         public void Clear()
         {
-
+            testObject.Clear();
         }
 
         private InputRow getInputRow(string url)
@@ -108,11 +125,6 @@ namespace Tests.Utils
             WebClient web = new WebClient();
             string htmlString = web.DownloadString(url);
             return new InputRow(htmlString);
-        }
-
-        private string converOutputStr(params string[] output)
-        {
-            return string.Join(",", output);
         }
     }
 }

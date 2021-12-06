@@ -6,9 +6,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WebSynthesis.TreeManipulation.Semantics\WebSynthesis.TreeManipulation.Semantics.csproj" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.37" />
     <PackageReference Include="Microsoft.ProgramSynthesis" Version="8.3.0" />
     <PackageReference Include="Microsoft.ProgramSynthesis.Common" Version="8.3.0" />
-    <PackageReference Include="Microsoft.ProgramSynthesis.DslcTargets" Version="8.3.0"/>
+    <PackageReference Include="Microsoft.ProgramSynthesis.DslcTargets" Version="8.3.0" />
     <DotNetCliToolReference Include="Microsoft.ProgramSynthesis.Dslc" Version="8.3.0" />
   </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@ using WebSynthesis.TreeManipulation;
 
 namespace WebSynthesis.Substring.RelationalProperties
 {
-    //[RelationalProperty("Substring Prefix Invariant", typeof(ProseHtmlNode))]
+    [RelationalProperty("Substring Prefix Invariant", typeof(ProseHtmlNode))]
     public class PrefixInvariance : IRelationalProperty
     {
         public string Name => "Substring Prefix Invariant";
@@ -38,7 +38,7 @@ namespace WebSynthesis.Substring.RelationalProperties
         }
     }
 
-    //[RelationalProperty("Substring Suffix Invariant", typeof(ProseHtmlNode))]
+    [RelationalProperty("Substring Suffix Invariant", typeof(ProseHtmlNode))]
     public class SuffixInvariance : IRelationalProperty
     {
         public string Name => "Substring Suffix Invariant";

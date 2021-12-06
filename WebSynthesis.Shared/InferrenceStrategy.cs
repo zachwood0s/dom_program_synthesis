@@ -87,10 +87,17 @@ namespace WebSynthesis.RelationalProperties
         {
             var pExamples = PerturbExamples(examples, properties);
             var spec = GetExampleSpec(pExamples);
-            var res = _prose.LearnGrammarTopK(spec, _score, k: 1, cancel: ct);
+            try
+            {
+                var res = _prose.LearnGrammarTopK(spec, _score, k: 1, cancel: ct);
+                return res;
+            }
+            catch
+            {
+                return null;
+            }
 
             //_log.SaveLogToXML("synthesis_log.xml");
-            return res;
         }
 
         public virtual ProgramSet GetProgramSetTimed(IEnumerable<Tuple<object, object>> examples, HashSet<IRelationalProperty> properties, int millisecondTimeBound)

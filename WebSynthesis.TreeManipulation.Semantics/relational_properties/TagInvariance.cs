@@ -6,12 +6,12 @@ using System.Text;
 namespace WebSynthesis.TreeManipulation.RelationalProperties
 {
 
-    //[RelationalProperty("Tag Invariant", typeof(ProseHtmlNode))]
+    [RelationalProperty("Tag Invariant", typeof(ProseHtmlNode))]
     public class TagInvariance : IRelationalProperty
     {
         public string Name => "Tag Invariant";
         public Type Type => typeof(ProseHtmlNode);
-        private const int MaxReorderCount = 2;
+        private const int MaxReorderCount = 3;
         public IEnumerable<Tuple<object, object>> ApplyProperty(object input, object output)
         {
             var node = input as ProseHtmlNode;

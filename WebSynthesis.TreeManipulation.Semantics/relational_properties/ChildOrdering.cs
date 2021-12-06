@@ -11,7 +11,7 @@ namespace WebSynthesis.TreeManipulation.RelationalProperties
     {
         public string Name => "Child Order Invariant";
         public Type Type => typeof(ProseHtmlNode);
-        private const int MaxReorderCount = 2;
+        private const int MaxReorderCount = 3;
         public IEnumerable<Tuple<object, object>> ApplyProperty(object input, object output)
         {
             var node = input as ProseHtmlNode;

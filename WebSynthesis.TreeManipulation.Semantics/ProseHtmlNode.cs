@@ -255,7 +255,7 @@ namespace WebSynthesis.TreeManipulation
                     seen.Add(n);
                 }
             }
-            Console.WriteLine($"Removed {count} duplicates");
+            //Console.WriteLine($"Removed {count} duplicates");
         }
 
         public void Simplify()

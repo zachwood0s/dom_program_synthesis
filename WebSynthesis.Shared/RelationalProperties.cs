@@ -32,7 +32,7 @@ namespace WebSynthesis.RelationalProperties
     public class RelationalApplicationStrategy : ApplicationStrategy
     {
         private Dictionary<RelationalPropertyAttribute, IRelationalProperty> _properties;
-        public int TimeoutMillilseconds { get; set; } = 60 * 1000; // 1 minute is default max time
+        public int TimeoutMillilseconds { get; set; } = 120 * 1000; // 1 minute is default max time
         public RelationalApplicationStrategy(string grammar) : base(grammar)
         {
             _properties = new Dictionary<RelationalPropertyAttribute, IRelationalProperty>();

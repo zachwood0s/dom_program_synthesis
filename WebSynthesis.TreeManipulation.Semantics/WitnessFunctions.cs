@@ -637,7 +637,7 @@ namespace WebSynthesis.TreeManipulation
                     return null;
                 result[inputState] = occList.Distinct().ToList();
             }
-            Console.WriteLine(descendentsByAttrValue);
+            //Console.WriteLine(descendentsByAttrValue);
             return new DisjunctiveExamplesSpec(result);
         }
 
