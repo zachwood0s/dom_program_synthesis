@@ -6,7 +6,7 @@ using System.Text;
 namespace WebSynthesis.TreeManipulation.RelationalProperties
 {
 
-    [RelationalProperty("Tag Invariant", typeof(ProseHtmlNode))]
+    //[RelationalProperty("Tag Invariant", typeof(ProseHtmlNode))]
     public class TagInvariance : IRelationalProperty
     {
         public string Name => "Tag Invariant";

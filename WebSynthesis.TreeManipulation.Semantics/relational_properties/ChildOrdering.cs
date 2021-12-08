@@ -6,7 +6,7 @@ using WebSynthesis.RelationalProperties;
 
 namespace WebSynthesis.TreeManipulation.RelationalProperties
 {
-    [RelationalProperty("Child Order Invariant", typeof(ProseHtmlNode))]
+    //[RelationalProperty("Child Order Invariant", typeof(ProseHtmlNode))]
     public class ChildOrderingInvariance : IRelationalProperty
     {
         public string Name => "Child Order Invariant";

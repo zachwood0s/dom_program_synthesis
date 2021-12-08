@@ -89,12 +89,13 @@ namespace Tests.Utils
             var casted = Examples.Select(x => new Tuple<object, object>(x.Item1, x.Item2));
             var learnedSet = _strategy.GetProgramSet(casted);
             watch.Stop();
-            
+
             /*
             var spec = getExampleSpec(_grammar);
 
             ProgramSet learnedSet = _prose.LearnGrammarTopK(spec, _score, k: 1);
             */
+            Console.WriteLine(string.Join(" ", Examples[0].Item2 as IEnumerable<string>));
 
             if (learnedSet == null)
             {
@@ -121,7 +122,13 @@ namespace Tests.Utils
             int failedTests = 0;
             foreach (var example in TestCases)
             {
-                failedTests += runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
+                var res = runRealizedProgramWith(programs.First(), _strategy.Grammar, example.Item1, example.Item2);
+                failedTests += res;
+                if (res == 1)
+                {
+                    Console.WriteLine(Examples[0].Item1 + " " + string.Join(" ", example.Item2 as IEnumerable<string>));
+                }
+
             }
 
             Console.WriteLine($"Tests passed {TestCases.Count - failedTests}/{TestCases.Count} | {(TestCases.Count - failedTests) / (float) TestCases.Count}%");
@@ -243,7 +250,7 @@ namespace Tests.Utils
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
-            return ProseHtmlNode.DeserializeFromHtmlNode(doc.DocumentNode.FirstChild);
+            return ProseHtmlNode.DeserializeFromHtmlNode(doc.DocumentNode.FirstChild, simplify: false);
         }
 
         private ProseHtmlNode ParseFromURL(string url)
@@ -283,8 +290,20 @@ namespace Tests.Utils
 
         private ProseHtmlNode ParseFromURL(string url)
         {
-            var web = new HtmlWeb();
-            var doc = web.Load(url);
+            var path = "saved/" + url.Replace("/", "").Replace(".", "").Replace(":", "").Replace("?", "") + ".html";
+            var doc = new HtmlDocument();
+            if(File.Exists(path))
+            {
+                Console.WriteLine("Loaded cached");
+                doc.Load(path);
+            }
+            else
+            {
+                Directory.CreateDirectory("saved");
+                var web = new HtmlWeb();
+                doc = web.Load(url);
+                doc.Save(path);
+            }
             doc.OptionOutputAsXml = true;
             var root = doc.DocumentNode;
 

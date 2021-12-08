@@ -47,7 +47,7 @@ namespace WebSynthesis.TreeManipulation
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(htmlText);
-            return ProseHtmlNode.DeserializeFromHtmlNode(doc.DocumentNode.FirstChild);
+            return ProseHtmlNode.DeserializeFromHtmlNode(doc.DocumentNode.FirstChild, simplify: false);
         }
 
         [ClassInitialize]

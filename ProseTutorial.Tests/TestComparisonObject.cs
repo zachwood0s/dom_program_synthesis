@@ -12,6 +12,7 @@ using Microsoft.ProgramSynthesis.Utils;
 using HtmlAgilityPack;
 using System.Net;
 using System.Diagnostics;
+using System.IO;
 
 namespace Tests.Utils
 {
@@ -122,8 +123,18 @@ namespace Tests.Utils
 
         private InputRow getInputRow(string url)
         {
-            WebClient web = new WebClient();
-            string htmlString = web.DownloadString(url);
+            var path = "saved/" + url.Replace("/", "").Replace(".", "").Replace(":", "").Replace("?", "") + ".html";
+            string htmlString;
+            if(File.Exists(path))
+            {
+                Console.WriteLine("Loaded cached");
+                htmlString = File.ReadAllText(path);
+            }
+            else
+            {
+                WebClient web = new WebClient();
+                htmlString = web.DownloadString(url);
+            }
             return new InputRow(htmlString);
         }
     }

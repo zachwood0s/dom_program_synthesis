@@ -120,12 +120,13 @@ namespace WebSynthesis.TreeManipulation
         }
 
 
-        public static ProseHtmlNode DeserializeFromHtmlNode(HtmlNode node)
+        public static ProseHtmlNode DeserializeFromHtmlNode(HtmlNode node, bool simplify = true)
         {
             var newNode = DeserializeFromHtmlNode(node, null);
 
             newNode.RemoveDuplicates();
-            newNode.Simplify();
+            if (simplify)
+                newNode.Simplify();
             return newNode;
         }
 
@@ -260,6 +261,20 @@ namespace WebSynthesis.TreeManipulation
 
         public void Simplify()
         {
+            /*
+            var count = 0;
+            TraversePostOrder(x =>
+            {
+                int res = x._childNodes.RemoveAll(c => c.ChildNodes.Count == 0 && (c.Text == null || c.Text.Length == 0));
+                if (res > 0)
+                {
+                    x._cachedHashCode = null;
+                    count += res;
+                }
+            });
+            Console.WriteLine($"Removed {count} empty nodes");
+            */
+            var count = 0;
             Traverse(x =>
             {
                 // Pull the children text into the parent if the only child is just a text node
@@ -268,8 +283,10 @@ namespace WebSynthesis.TreeManipulation
                     x.Text = x.ChildNodes[0].Text;
                     x._childNodes.RemoveAt(0);
                     x._cachedHashCode = null;
+                    count++;
                 }
             });
+            Console.WriteLine($"Combined {count} text nodes");
         }
 
         public ProseHtmlNode DeepCopy()
@@ -297,10 +314,37 @@ namespace WebSynthesis.TreeManipulation
             _childNodes.ForEach(x => x.Traverse(action));
         }
 
+        public void TraversePostOrder(Action<ProseHtmlNode> action)
+        {
+            _childNodes.ForEach(x => x.TraversePostOrder(action));
+            action(this);
+        }
+
         public void RandomlyOrderChildren()
         {
             var r = new Random();
             _childNodes = _childNodes.OrderBy(_ => r.NextDouble()).ToList();
+        }
+
+        public void RemoveRandomAttribute()
+        {
+            if (_attributes.Count > 0)
+                _attributes.Clear();
+            //_attributes.Remove(_attributes.ElementAt(r.Next(0, _attributes.Count)).Key);
+            _cachedHashCode = null;
+        }
+
+        public void RemoveChild(ProseHtmlNode child)
+        {
+            _childNodes.Remove(child);
+            _cachedHashCode = null;
+        }
+
+        public int RemoveAllChildren(Predicate<ProseHtmlNode> predicate)
+        {
+            var res = _childNodes.RemoveAll(predicate);
+            _cachedHashCode = null;
+            return res;
         }
     }
 }
